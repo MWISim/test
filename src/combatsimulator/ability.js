@@ -14,6 +14,7 @@ class Ability {
 
         this.manaCost = gameAbility.manaCost;
         this.cooldownDuration = gameAbility.cooldownDuration;
+        this.castDuration = gameAbility.castDuration;
 
         this.abilityEffects = [];
 
@@ -25,6 +26,7 @@ class Ability {
                 damageType: effect.damageType,
                 damageFlat: effect.baseDamageFlat + (this.level - 1) * effect.baseDamageFlatLevelBonus,
                 damageRatio: effect.baseDamageRatio + (this.level - 1) * effect.baseDamageRatioLevelBonus,
+                bonusAccuracyRatio: effect.bonusAccuracyRatio + (this.level - 1) * effect.bonusAccuracyRatioLevelBonus,
                 damageOverTimeRatio: effect.damageOverTimeRatio,
                 damageOverTimeDuration: effect.damageOverTimeDuration,
                 blindChance: effect.blindChance,

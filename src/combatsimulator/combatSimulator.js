@@ -329,13 +329,13 @@ class CombatSimulator extends EventTarget {
 
         switch (event.combatStyleHrid) {
             case "/combat_styles/magic":
-                let sourceMagicExperience = CombatUtilities.calculateMagicExperience(damage);
+                let sourceMagicExperience = CombatUtilities.calculateMagicExperience(damage, 0);
                 this.simResult.addExperienceGain(event.sourceRef, "magic", sourceMagicExperience);
                 break;
             case "/combat_styles/slash":
-                let sourceAttackExperience = CombatUtilities.calculateAttackExperience(damage, "/combat_styles/slash");
+                let sourceAttackExperience = CombatUtilities.calculateAttackExperience(damage, 0, "/combat_styles/slash");
                 this.simResult.addExperienceGain(event.sourceRef, "attack", sourceAttackExperience);
-                let sourcePowerExperience = CombatUtilities.calculatePowerExperience(damage, "/combat_styles/slash");
+                let sourcePowerExperience = CombatUtilities.calculatePowerExperience(damage, 0, "/combat_styles/slash");
                 this.simResult.addExperienceGain(event.sourceRef, "power", sourcePowerExperience);
                 break;
         }
@@ -689,7 +689,7 @@ class CombatSimulator extends EventTarget {
         }
 
         let amountHealed = CombatUtilities.processHeal(source, abilityEffect);
-        let experienceGained = CombatUtilities.calculateMagicExperience(amountHealed);
+        let experienceGained = CombatUtilities.calculateMagicExperience(amountHealed, 0);
 
         this.simResult.addHitpointsGained(source, ability.hrid, amountHealed);
         this.simResult.addExperienceGain(source, "magic", experienceGained);
