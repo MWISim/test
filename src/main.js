@@ -836,7 +836,8 @@ function showKills(simResult) {
         let price = 0;
         if (window.prices) {
             let item = window.prices[name];
-            if (item['bid'] !== -1) {
+            if (!item) {
+            } else if (item['bid'] !== -1) {
                 price += item['bid'];
             } else if (item['ask'] !== -1) {
                 price += item['ask'];
