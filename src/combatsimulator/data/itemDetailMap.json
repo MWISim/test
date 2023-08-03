@@ -106373,7 +106373,7 @@
   "/items/werewolf_claw": {
     "hrid": "/items/werewolf_claw",
     "name": "Werewolf Claw",
-    "description": "Material used in smithing Werewolf Slasher",
+    "description": "Material used in smithing Werewolf Slasher or crafting Vampiric Bow",
     "categoryHrid": "/item_categories/resource",
     "sellPrice": 10000,
     "isTradable": true,
