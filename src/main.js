@@ -258,6 +258,8 @@ function updateCombatStatsUI() {
         "totalWaterResistance",
         "totalNatureResistance",
         "totalFireResistance",
+        "abilityHaste",
+        "tenacity",
     ].forEach((stat) => {
         let element = document.getElementById("combatStat_" + stat);
         element.innerHTML = Math.floor(player.combatDetails[stat]);
@@ -281,8 +283,6 @@ function updateCombatStatsUI() {
         "waterPenetration",
         "naturePenetration",
         "firePenetration",
-        "abilityHaste",
-        "tenacity",
         "manaLeech",
         "castSpeed"
     ].forEach((stat) => {
@@ -1777,6 +1777,19 @@ function updateUI() {
     updateDrinksUI();
     updateAbilityUI();
 }
+
+const darkModeToggle = document.getElementById('darkModeToggle');
+const body = document.body;
+
+if (localStorage.getItem('darkModeEnabled') === 'true') {
+    body.classList.add('dark-mode');
+    darkModeToggle.checked = true;
+}
+
+darkModeToggle.addEventListener('change', () => {
+    body.classList.toggle('dark-mode');
+    localStorage.setItem('darkModeEnabled', darkModeToggle.checked);
+});
 
 initEquipmentSection();
 initLevelSection();

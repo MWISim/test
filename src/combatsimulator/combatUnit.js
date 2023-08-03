@@ -55,6 +55,8 @@ class CombatUnit {
         totalWaterResistance: 0.4,
         totalNatureResistance: 0.4,
         totalFireResistance: 0.4,
+        abilityHaste: 0,
+        tenacity: 0,
         combatStats: {
             combatStyleHrid: "/combat_styles/smash",
             damageType: "/damage_types/physical",
@@ -102,8 +104,6 @@ class CombatUnit {
             waterPenetration: 0,
             naturePenetration: 0,
             firePenetration: 0,
-            abilityHaste: 0,
-            tenacity: 0,
             manaLeech: 0,
             castSpeed: 0
         },
