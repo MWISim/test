@@ -8,6 +8,7 @@ class Zone {
         let gameZone = actionDetailMap[this.hrid];
         this.monsterSpawnInfo = gameZone.monsterSpawnInfo;
         this.encountersKilled = 0;
+        this.monsterSpawnInfo.battlesPerBoss = 10;
     }
 
     getRandomEncounter() {
