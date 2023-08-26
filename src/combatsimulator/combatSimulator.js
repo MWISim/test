@@ -55,9 +55,19 @@ class CombatSimulator extends EventTarget {
             }
         }
 
+        for (let i = 0; i < this.simResult.timeSpentAlive.length; i++) {
+            if (this.simResult.timeSpentAlive[i].alive == true) {
+                this.simResult.updateTimeSpentAlive(this.simResult.timeSpentAlive[i].name, false, simulationTimeLimit);
+            }
+        }
+
         this.simResult.simulatedTime = this.simulationTime;
         this.simResult.setDropRateMultipliers(this.players[0]);
         this.simResult.setManaUsed(this.players[0]);
+
+        if (this.zone.monsterSpawnInfo.bossFightMonsters) {
+            this.simResult.bossFightMonsters = this.zone.monsterSpawnInfo.bossFightMonsters;
+        }
 
         return this.simResult;
     }
@@ -134,6 +144,7 @@ class CombatSimulator extends EventTarget {
         this.players[0].combatDetails.currentHitpoints = this.players[0].combatDetails.maxHitpoints;
         this.players[0].combatDetails.currentManapoints = this.players[0].combatDetails.maxManapoints;
         this.players[0].clearBuffs();
+        this.players[0].clearCCs();
         this.startAttacks();
     }
 
@@ -146,6 +157,7 @@ class CombatSimulator extends EventTarget {
 
         this.enemies.forEach((enemy) => {
             enemy.reset(this.simulationTime);
+            this.simResult.updateTimeSpentAlive(enemy.hrid, true, this.simulationTime);
             // console.log(enemy.hrid, "spawned");
         });
 
@@ -216,6 +228,9 @@ class CombatSimulator extends EventTarget {
         if (target.combatDetails.currentHitpoints == 0) {
             this.eventQueue.clearEventsForUnit(target);
             this.simResult.addDeath(target);
+            if (!target.isPlayer) {
+                this.simResult.updateTimeSpentAlive(target.hrid, false, this.simulationTime);
+            }
             // console.log(target.hrid, "died");
         }
 
@@ -223,6 +238,9 @@ class CombatSimulator extends EventTarget {
         if (event.source.combatDetails.currentHitpoints == 0 && attackResult.reflectDamageDone != 0) {
             this.eventQueue.clearEventsForUnit(event.source);
             this.simResult.addDeath(event.source);
+            if (!event.source.isPlayer) {
+                this.simResult.updateTimeSpentAlive(event.source.hrid, false, this.simulationTime);
+            }
         }
 
         if (!this.checkEncounterEnd()) {
@@ -284,12 +302,19 @@ class CombatSimulator extends EventTarget {
         source.abilities
             .filter((ability) => ability != null)
             .forEach((ability) => {
-                if (!usedAbility && ability.shouldTrigger(this.simulationTime, source, target, friendlies, enemies) && this.canUseAbility(source, ability)) {
+                if (!usedAbility && ability.shouldTrigger(this.simulationTime, source, target, friendlies, enemies) && this.canUseAbility(source, ability, true)) {
                     let castDuration = ability.castDuration;
                     castDuration /= (1 + source.combatDetails.combatStats.castSpeed)
                     let abilityCastEndEvent = new AbilityCastEndEvent(this.simulationTime + castDuration, source, ability);
                     this.eventQueue.addEvent(abilityCastEndEvent);
-                    // console.log("used " + (this.simulationTime / 1000000000));
+                    /*-if (source.isPlayer) {
+                        let haste = source.combatDetails.combatStats.abilityHaste;
+                        let cooldownDuration = ability.cooldownDuration;
+                        if (haste > 0) {
+                            cooldownDuration = cooldownDuration * 100 / (100 + haste);
+                        }
+                        // console.log((this.simulationTime / 1000000000) + " Casting " + ability.hrid + " Cast time " + (castDuration / 1e9) + " Off CD at " + ((this.simulationTime + cooldownDuration + castDuration) / 1e9) + " CD " + ((cooldownDuration) / 1e9));
+                    }*/
                     usedAbility = true;
                 }
             });
@@ -310,14 +335,21 @@ class CombatSimulator extends EventTarget {
             source.abilities
                 .filter((ability) => ability != null)
                 .forEach((ability) => {
-                    let haste = source.combatDetails.abilityHaste;
-                    let cooldownDuration = ability.cooldownDuration;
-                    if (haste > 0) {
-                        cooldownDuration = cooldownDuration * 100 / (100 + haste);
-                    }
+                    // TODO account for regen tick
+                    if (this.canUseAbility(source, ability, false)) {
+                        let haste = source.combatDetails.combatStats.abilityHaste;
+                        let cooldownDuration = ability.cooldownDuration;
+                        if (haste > 0) {
+                            cooldownDuration = cooldownDuration * 100 / (100 + haste);
+                        }
 
-                    if (ability.lastUsed + cooldownDuration <= source.blindExpireTime && ability.lastUsed + cooldownDuration < nextCast) {
-                        nextCast = ability.lastUsed + cooldownDuration;
+                        let abilityNextCastTime = ability.lastUsed + cooldownDuration;
+
+                        if (abilityNextCastTime <= source.blindExpireTime && abilityNextCastTime < nextCast) {
+                            if (ability.shouldTrigger(abilityNextCastTime, source, target, friendlies, enemies)) {
+                                nextCast = abilityNextCastTime;
+                            }
+                        }
                     }
                 });
 
@@ -412,6 +444,9 @@ class CombatSimulator extends EventTarget {
         if (event.target.combatDetails.currentHitpoints == 0) {
             this.eventQueue.clearEventsForUnit(event.target);
             this.simResult.addDeath(event.target);
+            if (!event.target.isPlayer) {
+                this.simResult.updateTimeSpentAlive(event.target.hrid, false, this.simulationTime);
+            }
         }
 
         this.checkEncounterEnd();
@@ -562,13 +597,13 @@ class CombatSimulator extends EventTarget {
         return true;
     }
 
-    canUseAbility(source, ability) {
+    canUseAbility(source, ability, oomCheck) {
         if (source.combatDetails.currentHitpoints <= 0) {
             return false;
         }
 
         if (source.combatDetails.currentManapoints < ability.manaCost) {
-            if (source.isPlayer) {
+            if (source.isPlayer && oomCheck) {
                 this.simResult.playerRanOutOfMana = true;
             }
             return false;
@@ -578,7 +613,8 @@ class CombatSimulator extends EventTarget {
 
     tryUseAbility(source, ability) {
 
-        if (!this.canUseAbility(source, ability)) {
+        if (!this.canUseAbility(source, ability, true)) {
+            // console.log("Falseeeeeee");
             return false;
         }
 
@@ -599,13 +635,17 @@ class CombatSimulator extends EventTarget {
 
         ability.lastUsed = this.simulationTime;
 
-        let haste = source.combatDetails.abilityHaste;
+        let haste = source.combatDetails.combatStats.abilityHaste;
         let cooldownDuration = ability.cooldownDuration;
         if (haste > 0) {
             cooldownDuration = cooldownDuration * 100 / (100 + haste);
         }
 
-        // console.log("Use ability " + (this.simulationTime / 1000000000) + ability.hrid);
+        /*-if (source.isPlayer) {
+            let castDuration = ability.castDuration;
+            castDuration /= (1 + source.combatDetails.combatStats.castSpeed)
+            // console.log((this.simulationTime / 1000000000) + " Used ability " + ability.hrid + " Cast time " + (castDuration / 1e9));
+        }*/
         this.addNextAttackEvent(source);
 
         for (const abilityEffect of ability.abilityEffects) {
@@ -628,6 +668,9 @@ class CombatSimulator extends EventTarget {
         if (source.combatDetails.currentHitpoints == 0) {
             this.eventQueue.clearEventsForUnit(source);
             this.simResult.addDeath(source);
+            if (!source.isPlayer) {
+                this.simResult.updateTimeSpentAlive(source.hrid, false, this.simulationTime);
+            }
         }
 
         this.checkEncounterEnd();
@@ -740,6 +783,9 @@ class CombatSimulator extends EventTarget {
             if (target.combatDetails.currentHitpoints == 0) {
                 this.eventQueue.clearEventsForUnit(target);
                 this.simResult.addDeath(target);
+                if (!target.isPlayer) {
+                    this.simResult.updateTimeSpentAlive(target.hrid, false, this.simulationTime);
+                }
                 // console.log(target.hrid, "died");
             }
         }
