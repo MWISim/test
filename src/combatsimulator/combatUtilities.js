@@ -186,7 +186,7 @@ class CombatUtilities {
             let penetratedSourceResistance = sourceResistance
 
             if (targetPenetration > 0) {
-                penetratedSourceResistance = sourceResistance * (1 - targetPenetration);
+                penetratedSourceResistance = sourceResistance / (1 + targetPenetration);
             }
 
             let sourceDamageTakenRatio = 100 / (100 + penetratedSourceResistance);
