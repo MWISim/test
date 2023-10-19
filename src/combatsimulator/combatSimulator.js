@@ -329,6 +329,9 @@ class CombatSimulator extends EventTarget {
                 this.simulationTime + source.combatDetails.combatStats.attackInterval,
                 source
             );
+            /*-if (source.isPlayer) {
+                console.log("next attack " + ((this.simulationTime + source.combatDetails.combatStats.attackInterval) / 1e9))
+            }*/
             this.eventQueue.addEvent(autoAttackEvent);
         } else {
             let nextCast = Number.MAX_SAFE_INTEGER;
@@ -358,6 +361,9 @@ class CombatSimulator extends EventTarget {
                     source.blindExpireTime + source.combatDetails.combatStats.attackInterval,
                     source
                 );
+                /*-if (source.isPlayer) {
+                    console.log("next attack " + ((source.blindExpireTime + source.combatDetails.combatStats.attackInterval) / 1e9))
+                }*/
                 this.eventQueue.addEvent(autoAttackEvent);
             } else {
                 let awaitCooldownEvent = new AwaitCooldownEvent(
