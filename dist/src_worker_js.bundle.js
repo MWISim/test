@@ -2454,6 +2454,8 @@ class Monster extends _combatUnit__WEBPACK_IMPORTED_MODULE_1__["default"] {
             this.combatDetails.combatStats[key] = value;
         }
 
+        this.combatDetails.combatStats.attackInterval = gameMonster.combatDetails.attackInterval;
+
         super.updateCombatDetails();
     }
 }
