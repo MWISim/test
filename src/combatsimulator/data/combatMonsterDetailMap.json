@@ -1605,13 +1605,13 @@
             },
             {
                 "itemHrid": "/items/steady_shot",
-                "dropRate": 0.005,
+                "dropRate": 0.006,
                 "minCount": 1,
                 "maxCount": 1
             },
             {
                 "itemHrid": "/items/silencing_shot",
-                "dropRate": 0.005,
+                "dropRate": 0.006,
                 "minCount": 1,
                 "maxCount": 1
             },
@@ -7722,7 +7722,7 @@
             },
             {
                 "itemHrid": "/items/steady_shot",
-                "dropRate": 0.0016,
+                "dropRate": 0.002,
                 "minCount": 1,
                 "maxCount": 1
             },
