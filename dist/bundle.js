@@ -185,6 +185,7 @@ class CombatUnit {
     abilities = [null, null, null, null];
     food = [null, null, null];
     drinks = [null, null, null];
+    houseRooms = [];
     dropTable = [];
     rareDropTable = [];
     abilityManaCosts = new Map();
@@ -275,6 +276,7 @@ class CombatUnit {
         },
     };
     combatBuffs = {};
+    houseBuffs = {};
 
     constructor() { }
 
@@ -425,7 +427,9 @@ class CombatUnit {
         this.combatDetails.combatStats.castSpeed += this.getBuffBoost("/buff_types/cast_speed").flatBoost;
 
         this.combatDetails.combatStats.combatDropRate += (1 + this.combatDetails.combatStats.combatDropRate) * this.getBuffBoost("/buff_types/combat_drop_rate").ratioBoost;
-        this.combatDetails.combatStats.combatRareFind += (1 + this.combatDetails.combatStats.combatRareFind) * this.getBuffBoost("/buff_types/combat_rare_find").ratioBoost;
+        let combatRareFindBoosts = this.getBuffBoost("/buff_types/rare_find");
+        this.combatDetails.combatStats.combatRareFind += combatRareFindBoosts.flatBoost;
+        this.combatDetails.combatStats.combatRareFind += (1 + this.combatDetails.combatStats.combatRareFind) * combatRareFindBoosts.ratioBoost;
     }
 
     addBuff(buff, currentTime) {
@@ -433,6 +437,24 @@ class CombatUnit {
         this.combatBuffs[buff.uniqueHrid] = buff;
 
         this.updateCombatDetails();
+    }
+
+    addHouseBuff(buff) {
+        if (this.houseBuffs[buff.typeHrid]) {
+            this.houseBuffs[buff.typeHrid].flatBoost += buff.flatBoost;
+            this.houseBuffs[buff.typeHrid].ratioBoost += buff.ratioBoost;
+        } else {
+            this.houseBuffs[buff.typeHrid] = buff;
+        }
+    }
+
+    generateHouseBuffs() {
+        for (let i = 0; i < this.houseRooms.length; i++) {
+            const houseRoom = this.houseRooms[i];
+            houseRoom.buffs.forEach(buff => {
+                this.addHouseBuff(buff);
+            });
+        }
     }
 
     removeExpiredBuffs(currentTime) {
@@ -447,7 +469,7 @@ class CombatUnit {
     }
 
     clearBuffs() {
-        this.combatBuffs = {};
+        this.combatBuffs = this.houseBuffs;
         this.updateCombatDetails();
     }
 
@@ -704,6 +726,51 @@ class Equipment {
 
 /***/ }),
 
+/***/ "./src/combatsimulator/houseRoom.js":
+/*!******************************************!*\
+  !*** ./src/combatsimulator/houseRoom.js ***!
+  \******************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _buff__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./buff */ "./src/combatsimulator/buff.js");
+/* harmony import */ var _data_houseRoomDetailMap_json__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./data/houseRoomDetailMap.json */ "./src/combatsimulator/data/houseRoomDetailMap.json");
+
+
+
+class HouseRoom {
+    constructor(hrid, level) {
+        this.hrid = hrid;
+        this.level = level;
+
+        let gameHouseRoom = _data_houseRoomDetailMap_json__WEBPACK_IMPORTED_MODULE_1__[this.hrid];
+        if (!gameHouseRoom) {
+            throw new Error("No house room found for hrid: " + this.hrid);
+        }
+
+        this.buffs = [];
+        if (gameHouseRoom.actionBuffs) {
+            for (const actionBuff of gameHouseRoom.actionBuffs) {
+                let buff = new _buff__WEBPACK_IMPORTED_MODULE_0__["default"](actionBuff, level);
+                this.buffs.push(buff);
+            }
+        }
+        if (gameHouseRoom.globalBuffs) {
+            for (const globalBuff of gameHouseRoom.globalBuffs) {
+                let buff = new _buff__WEBPACK_IMPORTED_MODULE_0__["default"](globalBuff, level);
+                this.buffs.push(buff);
+            }
+        }
+    }
+}
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (HouseRoom);
+
+/***/ }),
+
 /***/ "./src/combatsimulator/player.js":
 /*!***************************************!*\
   !*** ./src/combatsimulator/player.js ***!
@@ -718,6 +785,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _combatUnit__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./combatUnit */ "./src/combatsimulator/combatUnit.js");
 /* harmony import */ var _consumable__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./consumable */ "./src/combatsimulator/consumable.js");
 /* harmony import */ var _equipment__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./equipment */ "./src/combatsimulator/equipment.js");
+/* harmony import */ var _houseRoom__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./houseRoom */ "./src/combatsimulator/houseRoom.js");
+
 
 
 
@@ -761,6 +830,11 @@ class Player extends _combatUnit__WEBPACK_IMPORTED_MODULE_1__["default"] {
         player.food = dto.food.map((food) => (food ? _consumable__WEBPACK_IMPORTED_MODULE_2__["default"].createFromDTO(food) : null));
         player.drinks = dto.drinks.map((drink) => (drink ? _consumable__WEBPACK_IMPORTED_MODULE_2__["default"].createFromDTO(drink) : null));
         player.abilities = dto.abilities.map((ability) => (ability ? _ability__WEBPACK_IMPORTED_MODULE_0__["default"].createFromDTO(ability) : null));
+        Object.entries(dto.houseRooms).forEach(houseRoom => {
+            if (houseRoom[1] > 0) {
+                player.houseRooms.push(new _houseRoom__WEBPACK_IMPORTED_MODULE_4__["default"](houseRoom[0], houseRoom[1]))
+            }
+        });
 
         return player;
     }
@@ -1123,6 +1197,16 @@ module.exports = JSON.parse('[0,1,2.1,3.3,4.6,6,7.5,9.1,10.8,12.600000000000001,
 
 /***/ }),
 
+/***/ "./src/combatsimulator/data/houseRoomDetailMap.json":
+/*!**********************************************************!*\
+  !*** ./src/combatsimulator/data/houseRoomDetailMap.json ***!
+  \**********************************************************/
+/***/ ((module) => {
+
+module.exports = JSON.parse('{"/house_rooms/archery_range":{"hrid":"/house_rooms/archery_range","name":"Archery Range","skillHrid":"/skills/ranged","usableInActionTypeMap":{"/action_types/combat":true},"actionBuffs":[{"uniqueHrid":"/buff_uniques/house_ranged_level","typeHrid":"/buff_types/ranged_level","ratioBoost":0,"ratioBoostLevelBonus":0,"flatBoost":1,"flatBoostLevelBonus":1,"startTime":"0001-01-01T00:00:00Z","duration":0}],"globalBuffs":[{"uniqueHrid":"/buff_uniques/house_experience","typeHrid":"/buff_types/wisdom","ratioBoost":0,"ratioBoostLevelBonus":0,"flatBoost":0.0005,"flatBoostLevelBonus":0.0005,"startTime":"0001-01-01T00:00:00Z","duration":0},{"uniqueHrid":"/buff_uniques/house_rare_find","typeHrid":"/buff_types/rare_find","ratioBoost":0,"ratioBoostLevelBonus":0,"flatBoost":0.002,"flatBoostLevelBonus":0.002,"startTime":"0001-01-01T00:00:00Z","duration":0}],"upgradeCostsMap":{"1":[{"itemHrid":"/items/coin","count":500000},{"itemHrid":"/items/lumber","count":75},{"itemHrid":"/items/wooden_crossbow","count":6},{"itemHrid":"/items/wooden_bow","count":4},{"itemHrid":"/items/rough_hood","count":4},{"itemHrid":"/items/rough_tunic","count":4},{"itemHrid":"/items/rough_chaps","count":4},{"itemHrid":"/items/rough_bracers","count":4},{"itemHrid":"/items/rough_boots","count":4}],"2":[{"itemHrid":"/items/coin","count":2000000},{"itemHrid":"/items/lumber","count":150},{"itemHrid":"/items/birch_lumber","count":150},{"itemHrid":"/items/wooden_crossbow","count":9},{"itemHrid":"/items/birch_crossbow","count":9},{"itemHrid":"/items/wooden_bow","count":6},{"itemHrid":"/items/birch_bow","count":6},{"itemHrid":"/items/reptile_hood","count":8},{"itemHrid":"/items/reptile_tunic","count":8},{"itemHrid":"/items/reptile_chaps","count":8},{"itemHrid":"/items/reptile_bracers","count":8},{"itemHrid":"/items/reptile_boots","count":8}],"3":[{"itemHrid":"/items/coin","count":5000000},{"itemHrid":"/items/birch_lumber","count":300},{"itemHrid":"/items/cedar_lumber","count":300},{"itemHrid":"/items/birch_crossbow","count":12},{"itemHrid":"/items/cedar_crossbow","count":12},{"itemHrid":"/items/birch_bow","count":8},{"itemHrid":"/items/cedar_bow","count":8},{"itemHrid":"/items/reptile_hood","count":16},{"itemHrid":"/items/reptile_tunic","count":16},{"itemHrid":"/items/reptile_chaps","count":16},{"itemHrid":"/items/reptile_bracers","count":16},{"itemHrid":"/items/reptile_boots","count":16}],"4":[{"itemHrid":"/items/coin","count":12000000},{"itemHrid":"/items/cedar_lumber","count":600},{"itemHrid":"/items/purpleheart_lumber","count":600},{"itemHrid":"/items/cedar_crossbow","count":15},{"itemHrid":"/items/purpleheart_crossbow","count":15},{"itemHrid":"/items/cedar_bow","count":10},{"itemHrid":"/items/purpleheart_bow","count":10},{"itemHrid":"/items/gobo_hood","count":16},{"itemHrid":"/items/gobo_tunic","count":16},{"itemHrid":"/items/gobo_chaps","count":16},{"itemHrid":"/items/gobo_bracers","count":16},{"itemHrid":"/items/gobo_boots","count":16},{"itemHrid":"/items/ranged_coffee","count":1000}],"5":[{"itemHrid":"/items/coin","count":25000000},{"itemHrid":"/items/purpleheart_lumber","count":1200},{"itemHrid":"/items/ginkgo_lumber","count":1200},{"itemHrid":"/items/purpleheart_crossbow","count":18},{"itemHrid":"/items/ginkgo_crossbow","count":18},{"itemHrid":"/items/purpleheart_bow","count":12},{"itemHrid":"/items/ginkgo_bow","count":12},{"itemHrid":"/items/gobo_hood","count":32},{"itemHrid":"/items/gobo_tunic","count":32},{"itemHrid":"/items/gobo_chaps","count":32},{"itemHrid":"/items/gobo_bracers","count":32},{"itemHrid":"/items/gobo_boots","count":32}],"6":[{"itemHrid":"/items/coin","count":50000000},{"itemHrid":"/items/ginkgo_lumber","count":2400},{"itemHrid":"/items/redwood_lumber","count":2400},{"itemHrid":"/items/ginkgo_crossbow","count":21},{"itemHrid":"/items/redwood_crossbow","count":21},{"itemHrid":"/items/ginkgo_bow","count":14},{"itemHrid":"/items/redwood_bow","count":14},{"itemHrid":"/items/beast_hood","count":24},{"itemHrid":"/items/beast_tunic","count":24},{"itemHrid":"/items/beast_chaps","count":24},{"itemHrid":"/items/beast_bracers","count":24},{"itemHrid":"/items/beast_boots","count":24}],"7":[{"itemHrid":"/items/coin","count":90000000},{"itemHrid":"/items/redwood_lumber","count":4800},{"itemHrid":"/items/arcane_lumber","count":4800},{"itemHrid":"/items/redwood_crossbow","count":24},{"itemHrid":"/items/arcane_crossbow","count":24},{"itemHrid":"/items/redwood_bow","count":16},{"itemHrid":"/items/arcane_bow","count":16},{"itemHrid":"/items/beast_hood","count":48},{"itemHrid":"/items/beast_tunic","count":48},{"itemHrid":"/items/beast_chaps","count":48},{"itemHrid":"/items/beast_bracers","count":48},{"itemHrid":"/items/beast_boots","count":48}],"8":[{"itemHrid":"/items/coin","count":160000000},{"itemHrid":"/items/arcane_lumber","count":12000},{"itemHrid":"/items/arcane_crossbow","count":60},{"itemHrid":"/items/arcane_bow","count":40},{"itemHrid":"/items/umbral_hood","count":40},{"itemHrid":"/items/umbral_tunic","count":40},{"itemHrid":"/items/umbral_chaps","count":40},{"itemHrid":"/items/umbral_bracers","count":40},{"itemHrid":"/items/umbral_boots","count":40},{"itemHrid":"/items/super_ranged_coffee","count":2000}]},"sortIndex":15},"/house_rooms/armory":{"hrid":"/house_rooms/armory","name":"Armory","skillHrid":"/skills/defense","usableInActionTypeMap":{"/action_types/combat":true},"actionBuffs":[{"uniqueHrid":"/buff_uniques/house_defense_level","typeHrid":"/buff_types/defense_level","ratioBoost":0,"ratioBoostLevelBonus":0,"flatBoost":1,"flatBoostLevelBonus":1,"startTime":"0001-01-01T00:00:00Z","duration":0}],"globalBuffs":[{"uniqueHrid":"/buff_uniques/house_experience","typeHrid":"/buff_types/wisdom","ratioBoost":0,"ratioBoostLevelBonus":0,"flatBoost":0.0005,"flatBoostLevelBonus":0.0005,"startTime":"0001-01-01T00:00:00Z","duration":0},{"uniqueHrid":"/buff_uniques/house_rare_find","typeHrid":"/buff_types/rare_find","ratioBoost":0,"ratioBoostLevelBonus":0,"flatBoost":0.002,"flatBoostLevelBonus":0.002,"startTime":"0001-01-01T00:00:00Z","duration":0}],"upgradeCostsMap":{"1":[{"itemHrid":"/items/coin","count":500000},{"itemHrid":"/items/lumber","count":75},{"itemHrid":"/items/cheese_helmet","count":8},{"itemHrid":"/items/cheese_plate_body","count":8},{"itemHrid":"/items/cheese_plate_legs","count":8},{"itemHrid":"/items/cheese_gauntlets","count":8},{"itemHrid":"/items/cheese_boots","count":8}],"2":[{"itemHrid":"/items/coin","count":2000000},{"itemHrid":"/items/lumber","count":150},{"itemHrid":"/items/birch_lumber","count":150},{"itemHrid":"/items/cheese_helmet","count":12},{"itemHrid":"/items/verdant_helmet","count":12},{"itemHrid":"/items/cheese_plate_body","count":12},{"itemHrid":"/items/verdant_plate_body","count":12},{"itemHrid":"/items/cheese_plate_legs","count":12},{"itemHrid":"/items/verdant_plate_legs","count":12},{"itemHrid":"/items/cheese_gauntlets","count":12},{"itemHrid":"/items/verdant_gauntlets","count":12},{"itemHrid":"/items/cheese_boots","count":12},{"itemHrid":"/items/verdant_boots","count":12}],"3":[{"itemHrid":"/items/coin","count":5000000},{"itemHrid":"/items/birch_lumber","count":300},{"itemHrid":"/items/cedar_lumber","count":300},{"itemHrid":"/items/verdant_helmet","count":16},{"itemHrid":"/items/azure_helmet","count":16},{"itemHrid":"/items/verdant_plate_body","count":16},{"itemHrid":"/items/azure_plate_body","count":16},{"itemHrid":"/items/verdant_plate_legs","count":16},{"itemHrid":"/items/azure_plate_legs","count":16},{"itemHrid":"/items/verdant_gauntlets","count":16},{"itemHrid":"/items/azure_gauntlets","count":16},{"itemHrid":"/items/verdant_boots","count":16},{"itemHrid":"/items/azure_boots","count":16}],"4":[{"itemHrid":"/items/coin","count":12000000},{"itemHrid":"/items/cedar_lumber","count":600},{"itemHrid":"/items/purpleheart_lumber","count":600},{"itemHrid":"/items/azure_helmet","count":20},{"itemHrid":"/items/burble_helmet","count":20},{"itemHrid":"/items/azure_plate_body","count":20},{"itemHrid":"/items/burble_plate_body","count":20},{"itemHrid":"/items/azure_plate_legs","count":20},{"itemHrid":"/items/burble_plate_legs","count":20},{"itemHrid":"/items/azure_gauntlets","count":20},{"itemHrid":"/items/burble_gauntlets","count":20},{"itemHrid":"/items/azure_boots","count":20},{"itemHrid":"/items/burble_boots","count":20},{"itemHrid":"/items/defense_coffee","count":1000}],"5":[{"itemHrid":"/items/coin","count":25000000},{"itemHrid":"/items/purpleheart_lumber","count":1200},{"itemHrid":"/items/ginkgo_lumber","count":1200},{"itemHrid":"/items/burble_helmet","count":24},{"itemHrid":"/items/crimson_helmet","count":24},{"itemHrid":"/items/burble_plate_body","count":24},{"itemHrid":"/items/crimson_plate_body","count":24},{"itemHrid":"/items/burble_plate_legs","count":24},{"itemHrid":"/items/crimson_plate_legs","count":24},{"itemHrid":"/items/burble_gauntlets","count":24},{"itemHrid":"/items/crimson_gauntlets","count":24},{"itemHrid":"/items/burble_boots","count":24},{"itemHrid":"/items/crimson_boots","count":24}],"6":[{"itemHrid":"/items/coin","count":50000000},{"itemHrid":"/items/ginkgo_lumber","count":2400},{"itemHrid":"/items/redwood_lumber","count":2400},{"itemHrid":"/items/crimson_helmet","count":28},{"itemHrid":"/items/rainbow_helmet","count":28},{"itemHrid":"/items/crimson_plate_body","count":28},{"itemHrid":"/items/rainbow_plate_body","count":28},{"itemHrid":"/items/crimson_plate_legs","count":28},{"itemHrid":"/items/rainbow_plate_legs","count":28},{"itemHrid":"/items/crimson_gauntlets","count":28},{"itemHrid":"/items/rainbow_gauntlets","count":28},{"itemHrid":"/items/crimson_boots","count":28},{"itemHrid":"/items/rainbow_boots","count":28}],"7":[{"itemHrid":"/items/coin","count":90000000},{"itemHrid":"/items/redwood_lumber","count":4800},{"itemHrid":"/items/arcane_lumber","count":4800},{"itemHrid":"/items/rainbow_helmet","count":32},{"itemHrid":"/items/holy_helmet","count":32},{"itemHrid":"/items/rainbow_plate_body","count":32},{"itemHrid":"/items/holy_plate_body","count":32},{"itemHrid":"/items/rainbow_plate_legs","count":32},{"itemHrid":"/items/holy_plate_legs","count":32},{"itemHrid":"/items/rainbow_gauntlets","count":32},{"itemHrid":"/items/holy_gauntlets","count":32},{"itemHrid":"/items/rainbow_boots","count":32},{"itemHrid":"/items/holy_boots","count":32}],"8":[{"itemHrid":"/items/coin","count":160000000},{"itemHrid":"/items/arcane_lumber","count":12000},{"itemHrid":"/items/holy_helmet","count":80},{"itemHrid":"/items/holy_plate_body","count":80},{"itemHrid":"/items/holy_plate_legs","count":80},{"itemHrid":"/items/holy_gauntlets","count":80},{"itemHrid":"/items/holy_boots","count":80},{"itemHrid":"/items/super_defense_coffee","count":2000}]},"sortIndex":14},"/house_rooms/brewery":{"hrid":"/house_rooms/brewery","name":"Brewery","skillHrid":"/skills/brewing","usableInActionTypeMap":{"/action_types/brewing":true},"actionBuffs":[{"uniqueHrid":"/buff_uniques/house_efficiency","typeHrid":"/buff_types/efficiency","ratioBoost":0,"ratioBoostLevelBonus":0,"flatBoost":0.015,"flatBoostLevelBonus":0.015,"startTime":"0001-01-01T00:00:00Z","duration":0}],"globalBuffs":[{"uniqueHrid":"/buff_uniques/house_experience","typeHrid":"/buff_types/wisdom","ratioBoost":0,"ratioBoostLevelBonus":0,"flatBoost":0.0005,"flatBoostLevelBonus":0.0005,"startTime":"0001-01-01T00:00:00Z","duration":0},{"uniqueHrid":"/buff_uniques/house_rare_find","typeHrid":"/buff_types/rare_find","ratioBoost":0,"ratioBoostLevelBonus":0,"flatBoost":0.002,"flatBoostLevelBonus":0.002,"startTime":"0001-01-01T00:00:00Z","duration":0}],"upgradeCostsMap":{"1":[{"itemHrid":"/items/coin","count":500000},{"itemHrid":"/items/lumber","count":75},{"itemHrid":"/items/green_tea_leaf","count":300},{"itemHrid":"/items/arabica_coffee_bean","count":300},{"itemHrid":"/items/cheese_pot","count":6}],"2":[{"itemHrid":"/items/coin","count":2000000},{"itemHrid":"/items/lumber","count":150},{"itemHrid":"/items/birch_lumber","count":150},{"itemHrid":"/items/green_tea_leaf","count":600},{"itemHrid":"/items/black_tea_leaf","count":600},{"itemHrid":"/items/arabica_coffee_bean","count":600},{"itemHrid":"/items/robusta_coffee_bean","count":600},{"itemHrid":"/items/cheese_pot","count":9},{"itemHrid":"/items/verdant_pot","count":9}],"3":[{"itemHrid":"/items/coin","count":5000000},{"itemHrid":"/items/birch_lumber","count":300},{"itemHrid":"/items/cedar_lumber","count":300},{"itemHrid":"/items/black_tea_leaf","count":2400},{"itemHrid":"/items/robusta_coffee_bean","count":2400},{"itemHrid":"/items/verdant_pot","count":12},{"itemHrid":"/items/azure_pot","count":12}],"4":[{"itemHrid":"/items/coin","count":12000000},{"itemHrid":"/items/cedar_lumber","count":600},{"itemHrid":"/items/purpleheart_lumber","count":600},{"itemHrid":"/items/black_tea_leaf","count":2400},{"itemHrid":"/items/burble_tea_leaf","count":2400},{"itemHrid":"/items/robusta_coffee_bean","count":2400},{"itemHrid":"/items/liberica_coffee_bean","count":2400},{"itemHrid":"/items/azure_pot","count":15},{"itemHrid":"/items/burble_pot","count":15},{"itemHrid":"/items/brewing_tea","count":1000}],"5":[{"itemHrid":"/items/coin","count":25000000},{"itemHrid":"/items/purpleheart_lumber","count":1200},{"itemHrid":"/items/ginkgo_lumber","count":1200},{"itemHrid":"/items/burble_tea_leaf","count":4800},{"itemHrid":"/items/moolong_tea_leaf","count":4800},{"itemHrid":"/items/liberica_coffee_bean","count":4800},{"itemHrid":"/items/excelsa_coffee_bean","count":4800},{"itemHrid":"/items/burble_pot","count":18},{"itemHrid":"/items/crimson_pot","count":18}],"6":[{"itemHrid":"/items/coin","count":50000000},{"itemHrid":"/items/ginkgo_lumber","count":2400},{"itemHrid":"/items/redwood_lumber","count":2400},{"itemHrid":"/items/moolong_tea_leaf","count":9600},{"itemHrid":"/items/red_tea_leaf","count":9600},{"itemHrid":"/items/excelsa_coffee_bean","count":9600},{"itemHrid":"/items/fieriosa_coffee_bean","count":9600},{"itemHrid":"/items/crimson_pot","count":21},{"itemHrid":"/items/rainbow_pot","count":21}],"7":[{"itemHrid":"/items/coin","count":90000000},{"itemHrid":"/items/redwood_lumber","count":4800},{"itemHrid":"/items/arcane_lumber","count":4800},{"itemHrid":"/items/red_tea_leaf","count":19200},{"itemHrid":"/items/emp_tea_leaf","count":19200},{"itemHrid":"/items/fieriosa_coffee_bean","count":19200},{"itemHrid":"/items/spacia_coffee_bean","count":19200},{"itemHrid":"/items/rainbow_pot","count":24},{"itemHrid":"/items/holy_pot","count":24}],"8":[{"itemHrid":"/items/coin","count":160000000},{"itemHrid":"/items/arcane_lumber","count":12000},{"itemHrid":"/items/emp_tea_leaf","count":48000},{"itemHrid":"/items/spacia_coffee_bean","count":48000},{"itemHrid":"/items/holy_pot","count":60},{"itemHrid":"/items/super_brewing_tea","count":2000}]},"sortIndex":8},"/house_rooms/dairy_barn":{"hrid":"/house_rooms/dairy_barn","name":"Dairy Barn","skillHrid":"/skills/milking","usableInActionTypeMap":{"/action_types/milking":true},"actionBuffs":[{"uniqueHrid":"/buff_uniques/house_efficiency","typeHrid":"/buff_types/efficiency","ratioBoost":0,"ratioBoostLevelBonus":0,"flatBoost":0.015,"flatBoostLevelBonus":0.015,"startTime":"0001-01-01T00:00:00Z","duration":0}],"globalBuffs":[{"uniqueHrid":"/buff_uniques/house_experience","typeHrid":"/buff_types/wisdom","ratioBoost":0,"ratioBoostLevelBonus":0,"flatBoost":0.0005,"flatBoostLevelBonus":0.0005,"startTime":"0001-01-01T00:00:00Z","duration":0},{"uniqueHrid":"/buff_uniques/house_rare_find","typeHrid":"/buff_types/rare_find","ratioBoost":0,"ratioBoostLevelBonus":0,"flatBoost":0.002,"flatBoostLevelBonus":0.002,"startTime":"0001-01-01T00:00:00Z","duration":0}],"upgradeCostsMap":{"1":[{"itemHrid":"/items/coin","count":500000},{"itemHrid":"/items/lumber","count":75},{"itemHrid":"/items/milk","count":1500},{"itemHrid":"/items/cheese_brush","count":6}],"2":[{"itemHrid":"/items/coin","count":2000000},{"itemHrid":"/items/lumber","count":150},{"itemHrid":"/items/birch_lumber","count":150},{"itemHrid":"/items/milk","count":3000},{"itemHrid":"/items/verdant_milk","count":3000},{"itemHrid":"/items/cheese_brush","count":9},{"itemHrid":"/items/verdant_brush","count":9}],"3":[{"itemHrid":"/items/coin","count":5000000},{"itemHrid":"/items/birch_lumber","count":300},{"itemHrid":"/items/cedar_lumber","count":300},{"itemHrid":"/items/verdant_milk","count":6000},{"itemHrid":"/items/azure_milk","count":6000},{"itemHrid":"/items/verdant_brush","count":12},{"itemHrid":"/items/azure_brush","count":12}],"4":[{"itemHrid":"/items/coin","count":12000000},{"itemHrid":"/items/cedar_lumber","count":600},{"itemHrid":"/items/purpleheart_lumber","count":600},{"itemHrid":"/items/azure_milk","count":12000},{"itemHrid":"/items/burble_milk","count":12000},{"itemHrid":"/items/azure_brush","count":15},{"itemHrid":"/items/burble_brush","count":15},{"itemHrid":"/items/milking_tea","count":1000}],"5":[{"itemHrid":"/items/coin","count":25000000},{"itemHrid":"/items/purpleheart_lumber","count":1200},{"itemHrid":"/items/ginkgo_lumber","count":1200},{"itemHrid":"/items/burble_milk","count":24000},{"itemHrid":"/items/crimson_milk","count":24000},{"itemHrid":"/items/burble_brush","count":18},{"itemHrid":"/items/crimson_brush","count":18}],"6":[{"itemHrid":"/items/coin","count":50000000},{"itemHrid":"/items/ginkgo_lumber","count":2400},{"itemHrid":"/items/redwood_lumber","count":2400},{"itemHrid":"/items/crimson_milk","count":48000},{"itemHrid":"/items/rainbow_milk","count":48000},{"itemHrid":"/items/crimson_brush","count":21},{"itemHrid":"/items/rainbow_brush","count":21}],"7":[{"itemHrid":"/items/coin","count":90000000},{"itemHrid":"/items/redwood_lumber","count":4800},{"itemHrid":"/items/arcane_lumber","count":4800},{"itemHrid":"/items/rainbow_milk","count":96000},{"itemHrid":"/items/holy_milk","count":96000},{"itemHrid":"/items/rainbow_brush","count":24},{"itemHrid":"/items/holy_brush","count":24}],"8":[{"itemHrid":"/items/coin","count":160000000},{"itemHrid":"/items/arcane_lumber","count":12000},{"itemHrid":"/items/holy_milk","count":240000},{"itemHrid":"/items/holy_brush","count":60},{"itemHrid":"/items/super_milking_tea","count":2000}]},"sortIndex":1},"/house_rooms/dining_room":{"hrid":"/house_rooms/dining_room","name":"Dining Room","skillHrid":"/skills/stamina","usableInActionTypeMap":{"/action_types/combat":true},"actionBuffs":[{"uniqueHrid":"/buff_uniques/house_stamina_level","typeHrid":"/buff_types/stamina_level","ratioBoost":0,"ratioBoostLevelBonus":0,"flatBoost":1,"flatBoostLevelBonus":1,"startTime":"0001-01-01T00:00:00Z","duration":0},{"uniqueHrid":"/buff_uniques/house_hp_regen","typeHrid":"/buff_types/hp_regen","ratioBoost":0,"ratioBoostLevelBonus":0,"flatBoost":0.0003,"flatBoostLevelBonus":0.0003,"startTime":"0001-01-01T00:00:00Z","duration":0}],"globalBuffs":[{"uniqueHrid":"/buff_uniques/house_experience","typeHrid":"/buff_types/wisdom","ratioBoost":0,"ratioBoostLevelBonus":0,"flatBoost":0.0005,"flatBoostLevelBonus":0.0005,"startTime":"0001-01-01T00:00:00Z","duration":0},{"uniqueHrid":"/buff_uniques/house_rare_find","typeHrid":"/buff_types/rare_find","ratioBoost":0,"ratioBoostLevelBonus":0,"flatBoost":0.002,"flatBoostLevelBonus":0.002,"startTime":"0001-01-01T00:00:00Z","duration":0}],"upgradeCostsMap":{"1":[{"itemHrid":"/items/coin","count":500000},{"itemHrid":"/items/lumber","count":75},{"itemHrid":"/items/donut","count":125},{"itemHrid":"/items/cupcake","count":125},{"itemHrid":"/items/small_pouch","count":1}],"2":[{"itemHrid":"/items/coin","count":2000000},{"itemHrid":"/items/lumber","count":150},{"itemHrid":"/items/birch_lumber","count":150},{"itemHrid":"/items/donut","count":250},{"itemHrid":"/items/blueberry_donut","count":250},{"itemHrid":"/items/cupcake","count":250},{"itemHrid":"/items/blueberry_cake","count":250},{"itemHrid":"/items/small_pouch","count":3}],"3":[{"itemHrid":"/items/coin","count":5000000},{"itemHrid":"/items/birch_lumber","count":300},{"itemHrid":"/items/cedar_lumber","count":300},{"itemHrid":"/items/blueberry_donut","count":500},{"itemHrid":"/items/blackberry_donut","count":500},{"itemHrid":"/items/blueberry_cake","count":500},{"itemHrid":"/items/blackberry_cake","count":500},{"itemHrid":"/items/medium_pouch","count":1}],"4":[{"itemHrid":"/items/coin","count":12000000},{"itemHrid":"/items/cedar_lumber","count":600},{"itemHrid":"/items/purpleheart_lumber","count":600},{"itemHrid":"/items/blackberry_donut","count":1000},{"itemHrid":"/items/strawberry_donut","count":1000},{"itemHrid":"/items/blackberry_cake","count":1000},{"itemHrid":"/items/strawberry_cake","count":1000},{"itemHrid":"/items/medium_pouch","count":3},{"itemHrid":"/items/stamina_coffee","count":1000}],"5":[{"itemHrid":"/items/coin","count":25000000},{"itemHrid":"/items/purpleheart_lumber","count":1200},{"itemHrid":"/items/ginkgo_lumber","count":1200},{"itemHrid":"/items/strawberry_donut","count":2000},{"itemHrid":"/items/mooberry_donut","count":2000},{"itemHrid":"/items/strawberry_cake","count":2000},{"itemHrid":"/items/mooberry_cake","count":2000},{"itemHrid":"/items/large_pouch","count":1}],"6":[{"itemHrid":"/items/coin","count":50000000},{"itemHrid":"/items/ginkgo_lumber","count":2400},{"itemHrid":"/items/redwood_lumber","count":2400},{"itemHrid":"/items/mooberry_donut","count":4000},{"itemHrid":"/items/marsberry_donut","count":4000},{"itemHrid":"/items/mooberry_cake","count":4000},{"itemHrid":"/items/marsberry_cake","count":4000},{"itemHrid":"/items/large_pouch","count":3}],"7":[{"itemHrid":"/items/coin","count":90000000},{"itemHrid":"/items/redwood_lumber","count":4800},{"itemHrid":"/items/arcane_lumber","count":4800},{"itemHrid":"/items/marsberry_donut","count":8000},{"itemHrid":"/items/spaceberry_donut","count":8000},{"itemHrid":"/items/marsberry_cake","count":8000},{"itemHrid":"/items/spaceberry_cake","count":8000},{"itemHrid":"/items/giant_pouch","count":1}],"8":[{"itemHrid":"/items/coin","count":160000000},{"itemHrid":"/items/arcane_lumber","count":12000},{"itemHrid":"/items/spaceberry_donut","count":20000},{"itemHrid":"/items/spaceberry_cake","count":20000},{"itemHrid":"/items/giant_pouch","count":3},{"itemHrid":"/items/super_stamina_coffee","count":2000}]},"sortIndex":10},"/house_rooms/dojo":{"hrid":"/house_rooms/dojo","name":"Dojo","skillHrid":"/skills/attack","usableInActionTypeMap":{"/action_types/combat":true},"actionBuffs":[{"uniqueHrid":"/buff_uniques/house_attack_level","typeHrid":"/buff_types/attack_level","ratioBoost":0,"ratioBoostLevelBonus":0,"flatBoost":1,"flatBoostLevelBonus":1,"startTime":"0001-01-01T00:00:00Z","duration":0},{"uniqueHrid":"/buff_uniques/house_attack_speed","typeHrid":"/buff_types/attack_speed","ratioBoost":0.005,"ratioBoostLevelBonus":0.005,"flatBoost":0,"flatBoostLevelBonus":0,"startTime":"0001-01-01T00:00:00Z","duration":0}],"globalBuffs":[{"uniqueHrid":"/buff_uniques/house_experience","typeHrid":"/buff_types/wisdom","ratioBoost":0,"ratioBoostLevelBonus":0,"flatBoost":0.0005,"flatBoostLevelBonus":0.0005,"startTime":"0001-01-01T00:00:00Z","duration":0},{"uniqueHrid":"/buff_uniques/house_rare_find","typeHrid":"/buff_types/rare_find","ratioBoost":0,"ratioBoostLevelBonus":0,"flatBoost":0.002,"flatBoostLevelBonus":0.002,"startTime":"0001-01-01T00:00:00Z","duration":0}],"upgradeCostsMap":{"1":[{"itemHrid":"/items/coin","count":500000},{"itemHrid":"/items/lumber","count":75},{"itemHrid":"/items/cheese_spear","count":16},{"itemHrid":"/items/cheese_sword","count":8}],"2":[{"itemHrid":"/items/coin","count":2000000},{"itemHrid":"/items/lumber","count":150},{"itemHrid":"/items/birch_lumber","count":150},{"itemHrid":"/items/cheese_spear","count":24},{"itemHrid":"/items/verdant_spear","count":24},{"itemHrid":"/items/cheese_sword","count":12},{"itemHrid":"/items/verdant_sword","count":12}],"3":[{"itemHrid":"/items/coin","count":5000000},{"itemHrid":"/items/birch_lumber","count":300},{"itemHrid":"/items/cedar_lumber","count":300},{"itemHrid":"/items/verdant_spear","count":32},{"itemHrid":"/items/azure_spear","count":32},{"itemHrid":"/items/verdant_sword","count":16},{"itemHrid":"/items/azure_sword","count":16}],"4":[{"itemHrid":"/items/coin","count":12000000},{"itemHrid":"/items/cedar_lumber","count":600},{"itemHrid":"/items/purpleheart_lumber","count":600},{"itemHrid":"/items/azure_spear","count":40},{"itemHrid":"/items/burble_spear","count":40},{"itemHrid":"/items/azure_sword","count":20},{"itemHrid":"/items/burble_sword","count":20},{"itemHrid":"/items/attack_coffee","count":1000}],"5":[{"itemHrid":"/items/coin","count":25000000},{"itemHrid":"/items/purpleheart_lumber","count":1200},{"itemHrid":"/items/ginkgo_lumber","count":1200},{"itemHrid":"/items/burble_spear","count":48},{"itemHrid":"/items/crimson_spear","count":48},{"itemHrid":"/items/burble_sword","count":24},{"itemHrid":"/items/crimson_sword","count":24}],"6":[{"itemHrid":"/items/coin","count":50000000},{"itemHrid":"/items/ginkgo_lumber","count":2400},{"itemHrid":"/items/redwood_lumber","count":2400},{"itemHrid":"/items/crimson_spear","count":56},{"itemHrid":"/items/rainbow_spear","count":56},{"itemHrid":"/items/crimson_sword","count":28},{"itemHrid":"/items/rainbow_sword","count":28}],"7":[{"itemHrid":"/items/coin","count":90000000},{"itemHrid":"/items/redwood_lumber","count":4800},{"itemHrid":"/items/arcane_lumber","count":4800},{"itemHrid":"/items/rainbow_spear","count":64},{"itemHrid":"/items/holy_spear","count":64},{"itemHrid":"/items/rainbow_sword","count":32},{"itemHrid":"/items/holy_sword","count":32}],"8":[{"itemHrid":"/items/coin","count":160000000},{"itemHrid":"/items/arcane_lumber","count":12000},{"itemHrid":"/items/holy_spear","count":160},{"itemHrid":"/items/holy_sword","count":80},{"itemHrid":"/items/super_attack_coffee","count":2000}]},"sortIndex":12},"/house_rooms/forge":{"hrid":"/house_rooms/forge","name":"Forge","skillHrid":"/skills/cheesesmithing","usableInActionTypeMap":{"/action_types/cheesesmithing":true},"actionBuffs":[{"uniqueHrid":"/buff_uniques/house_efficiency","typeHrid":"/buff_types/efficiency","ratioBoost":0,"ratioBoostLevelBonus":0,"flatBoost":0.015,"flatBoostLevelBonus":0.015,"startTime":"0001-01-01T00:00:00Z","duration":0}],"globalBuffs":[{"uniqueHrid":"/buff_uniques/house_experience","typeHrid":"/buff_types/wisdom","ratioBoost":0,"ratioBoostLevelBonus":0,"flatBoost":0.0005,"flatBoostLevelBonus":0.0005,"startTime":"0001-01-01T00:00:00Z","duration":0},{"uniqueHrid":"/buff_uniques/house_rare_find","typeHrid":"/buff_types/rare_find","ratioBoost":0,"ratioBoostLevelBonus":0,"flatBoost":0.002,"flatBoostLevelBonus":0.002,"startTime":"0001-01-01T00:00:00Z","duration":0}],"upgradeCostsMap":{"1":[{"itemHrid":"/items/coin","count":500000},{"itemHrid":"/items/lumber","count":75},{"itemHrid":"/items/cheese","count":375},{"itemHrid":"/items/cheese_hammer","count":6}],"2":[{"itemHrid":"/items/coin","count":2000000},{"itemHrid":"/items/lumber","count":150},{"itemHrid":"/items/birch_lumber","count":150},{"itemHrid":"/items/cheese","count":750},{"itemHrid":"/items/verdant_cheese","count":750},{"itemHrid":"/items/cheese_hammer","count":9},{"itemHrid":"/items/verdant_hammer","count":9}],"3":[{"itemHrid":"/items/coin","count":5000000},{"itemHrid":"/items/birch_lumber","count":300},{"itemHrid":"/items/cedar_lumber","count":300},{"itemHrid":"/items/verdant_cheese","count":1500},{"itemHrid":"/items/azure_cheese","count":1500},{"itemHrid":"/items/verdant_hammer","count":12},{"itemHrid":"/items/azure_hammer","count":12}],"4":[{"itemHrid":"/items/coin","count":12000000},{"itemHrid":"/items/cedar_lumber","count":600},{"itemHrid":"/items/purpleheart_lumber","count":600},{"itemHrid":"/items/azure_cheese","count":3000},{"itemHrid":"/items/burble_cheese","count":3000},{"itemHrid":"/items/azure_hammer","count":15},{"itemHrid":"/items/burble_hammer","count":15},{"itemHrid":"/items/cheesesmithing_tea","count":1000}],"5":[{"itemHrid":"/items/coin","count":25000000},{"itemHrid":"/items/purpleheart_lumber","count":1200},{"itemHrid":"/items/ginkgo_lumber","count":1200},{"itemHrid":"/items/burble_cheese","count":6000},{"itemHrid":"/items/crimson_cheese","count":6000},{"itemHrid":"/items/burble_hammer","count":18},{"itemHrid":"/items/crimson_hammer","count":18}],"6":[{"itemHrid":"/items/coin","count":50000000},{"itemHrid":"/items/ginkgo_lumber","count":2400},{"itemHrid":"/items/redwood_lumber","count":2400},{"itemHrid":"/items/crimson_cheese","count":12000},{"itemHrid":"/items/rainbow_cheese","count":12000},{"itemHrid":"/items/crimson_hammer","count":21},{"itemHrid":"/items/rainbow_hammer","count":21}],"7":[{"itemHrid":"/items/coin","count":90000000},{"itemHrid":"/items/redwood_lumber","count":4800},{"itemHrid":"/items/arcane_lumber","count":4800},{"itemHrid":"/items/rainbow_cheese","count":24000},{"itemHrid":"/items/holy_cheese","count":24000},{"itemHrid":"/items/rainbow_hammer","count":24},{"itemHrid":"/items/holy_hammer","count":24}],"8":[{"itemHrid":"/items/coin","count":160000000},{"itemHrid":"/items/arcane_lumber","count":12000},{"itemHrid":"/items/holy_cheese","count":60000},{"itemHrid":"/items/holy_hammer","count":60},{"itemHrid":"/items/super_cheesesmithing_tea","count":2000}]},"sortIndex":4},"/house_rooms/garden":{"hrid":"/house_rooms/garden","name":"Garden","skillHrid":"/skills/foraging","usableInActionTypeMap":{"/action_types/foraging":true},"actionBuffs":[{"uniqueHrid":"/buff_uniques/house_efficiency","typeHrid":"/buff_types/efficiency","ratioBoost":0,"ratioBoostLevelBonus":0,"flatBoost":0.015,"flatBoostLevelBonus":0.015,"startTime":"0001-01-01T00:00:00Z","duration":0}],"globalBuffs":[{"uniqueHrid":"/buff_uniques/house_experience","typeHrid":"/buff_types/wisdom","ratioBoost":0,"ratioBoostLevelBonus":0,"flatBoost":0.0005,"flatBoostLevelBonus":0.0005,"startTime":"0001-01-01T00:00:00Z","duration":0},{"uniqueHrid":"/buff_uniques/house_rare_find","typeHrid":"/buff_types/rare_find","ratioBoost":0,"ratioBoostLevelBonus":0,"flatBoost":0.002,"flatBoostLevelBonus":0.002,"startTime":"0001-01-01T00:00:00Z","duration":0}],"upgradeCostsMap":{"1":[{"itemHrid":"/items/coin","count":500000},{"itemHrid":"/items/lumber","count":75},{"itemHrid":"/items/egg","count":500},{"itemHrid":"/items/wheat","count":500},{"itemHrid":"/items/cotton","count":750},{"itemHrid":"/items/cheese_shears","count":6}],"2":[{"itemHrid":"/items/coin","count":2000000},{"itemHrid":"/items/lumber","count":150},{"itemHrid":"/items/birch_lumber","count":150},{"itemHrid":"/items/egg","count":1000},{"itemHrid":"/items/blueberry","count":1000},{"itemHrid":"/items/wheat","count":1000},{"itemHrid":"/items/apple","count":500},{"itemHrid":"/items/cotton","count":1500},{"itemHrid":"/items/flax","count":1500},{"itemHrid":"/items/cheese_shears","count":9},{"itemHrid":"/items/verdant_shears","count":9}],"3":[{"itemHrid":"/items/coin","count":5000000},{"itemHrid":"/items/birch_lumber","count":300},{"itemHrid":"/items/cedar_lumber","count":300},{"itemHrid":"/items/blueberry","count":2000},{"itemHrid":"/items/blackberry","count":2000},{"itemHrid":"/items/apple","count":1000},{"itemHrid":"/items/orange","count":1000},{"itemHrid":"/items/flax","count":6000},{"itemHrid":"/items/verdant_shears","count":12},{"itemHrid":"/items/azure_shears","count":12}],"4":[{"itemHrid":"/items/coin","count":12000000},{"itemHrid":"/items/cedar_lumber","count":600},{"itemHrid":"/items/purpleheart_lumber","count":600},{"itemHrid":"/items/blackberry","count":4000},{"itemHrid":"/items/strawberry","count":4000},{"itemHrid":"/items/orange","count":2000},{"itemHrid":"/items/plum","count":2000},{"itemHrid":"/items/flax","count":6000},{"itemHrid":"/items/bamboo_branch","count":6000},{"itemHrid":"/items/azure_shears","count":15},{"itemHrid":"/items/burble_shears","count":15},{"itemHrid":"/items/foraging_tea","count":1000}],"5":[{"itemHrid":"/items/coin","count":25000000},{"itemHrid":"/items/purpleheart_lumber","count":1200},{"itemHrid":"/items/ginkgo_lumber","count":1200},{"itemHrid":"/items/strawberry","count":8000},{"itemHrid":"/items/mooberry","count":8000},{"itemHrid":"/items/plum","count":4000},{"itemHrid":"/items/peach","count":4000},{"itemHrid":"/items/bamboo_branch","count":24000},{"itemHrid":"/items/burble_shears","count":18},{"itemHrid":"/items/crimson_shears","count":18}],"6":[{"itemHrid":"/items/coin","count":50000000},{"itemHrid":"/items/ginkgo_lumber","count":2400},{"itemHrid":"/items/redwood_lumber","count":2400},{"itemHrid":"/items/mooberry","count":16000},{"itemHrid":"/items/marsberry","count":16000},{"itemHrid":"/items/peach","count":8000},{"itemHrid":"/items/dragon_fruit","count":8000},{"itemHrid":"/items/bamboo_branch","count":24000},{"itemHrid":"/items/cocoon","count":24000},{"itemHrid":"/items/crimson_shears","count":21},{"itemHrid":"/items/rainbow_shears","count":21}],"7":[{"itemHrid":"/items/coin","count":90000000},{"itemHrid":"/items/redwood_lumber","count":4800},{"itemHrid":"/items/arcane_lumber","count":4800},{"itemHrid":"/items/marsberry","count":32000},{"itemHrid":"/items/spaceberry","count":32000},{"itemHrid":"/items/dragon_fruit","count":16000},{"itemHrid":"/items/star_fruit","count":16000},{"itemHrid":"/items/cocoon","count":48000},{"itemHrid":"/items/radiant_fiber","count":48000},{"itemHrid":"/items/rainbow_shears","count":24},{"itemHrid":"/items/holy_shears","count":24}],"8":[{"itemHrid":"/items/coin","count":160000000},{"itemHrid":"/items/arcane_lumber","count":12000},{"itemHrid":"/items/spaceberry","count":80000},{"itemHrid":"/items/star_fruit","count":40000},{"itemHrid":"/items/radiant_fiber","count":120000},{"itemHrid":"/items/holy_shears","count":60},{"itemHrid":"/items/super_foraging_tea","count":2000}]},"sortIndex":2},"/house_rooms/gym":{"hrid":"/house_rooms/gym","name":"Gym","skillHrid":"/skills/power","usableInActionTypeMap":{"/action_types/combat":true},"actionBuffs":[{"uniqueHrid":"/buff_uniques/house_power_level","typeHrid":"/buff_types/power_level","ratioBoost":0,"ratioBoostLevelBonus":0,"flatBoost":1,"flatBoostLevelBonus":1,"startTime":"0001-01-01T00:00:00Z","duration":0}],"globalBuffs":[{"uniqueHrid":"/buff_uniques/house_experience","typeHrid":"/buff_types/wisdom","ratioBoost":0,"ratioBoostLevelBonus":0,"flatBoost":0.0005,"flatBoostLevelBonus":0.0005,"startTime":"0001-01-01T00:00:00Z","duration":0},{"uniqueHrid":"/buff_uniques/house_rare_find","typeHrid":"/buff_types/rare_find","ratioBoost":0,"ratioBoostLevelBonus":0,"flatBoost":0.002,"flatBoostLevelBonus":0.002,"startTime":"0001-01-01T00:00:00Z","duration":0}],"upgradeCostsMap":{"1":[{"itemHrid":"/items/coin","count":500000},{"itemHrid":"/items/lumber","count":75},{"itemHrid":"/items/cheese_mace","count":16},{"itemHrid":"/items/cheese_sword","count":8}],"2":[{"itemHrid":"/items/coin","count":2000000},{"itemHrid":"/items/lumber","count":150},{"itemHrid":"/items/birch_lumber","count":150},{"itemHrid":"/items/cheese_mace","count":24},{"itemHrid":"/items/verdant_mace","count":24},{"itemHrid":"/items/cheese_sword","count":12},{"itemHrid":"/items/verdant_sword","count":12}],"3":[{"itemHrid":"/items/coin","count":5000000},{"itemHrid":"/items/birch_lumber","count":300},{"itemHrid":"/items/cedar_lumber","count":300},{"itemHrid":"/items/verdant_mace","count":32},{"itemHrid":"/items/azure_mace","count":32},{"itemHrid":"/items/verdant_sword","count":16},{"itemHrid":"/items/azure_sword","count":16}],"4":[{"itemHrid":"/items/coin","count":12000000},{"itemHrid":"/items/cedar_lumber","count":600},{"itemHrid":"/items/purpleheart_lumber","count":600},{"itemHrid":"/items/azure_mace","count":40},{"itemHrid":"/items/burble_mace","count":40},{"itemHrid":"/items/azure_sword","count":20},{"itemHrid":"/items/burble_sword","count":20},{"itemHrid":"/items/power_coffee","count":1000}],"5":[{"itemHrid":"/items/coin","count":25000000},{"itemHrid":"/items/purpleheart_lumber","count":1200},{"itemHrid":"/items/ginkgo_lumber","count":1200},{"itemHrid":"/items/burble_mace","count":48},{"itemHrid":"/items/crimson_mace","count":48},{"itemHrid":"/items/burble_sword","count":24},{"itemHrid":"/items/crimson_sword","count":24}],"6":[{"itemHrid":"/items/coin","count":50000000},{"itemHrid":"/items/ginkgo_lumber","count":2400},{"itemHrid":"/items/redwood_lumber","count":2400},{"itemHrid":"/items/crimson_mace","count":56},{"itemHrid":"/items/rainbow_mace","count":56},{"itemHrid":"/items/crimson_sword","count":28},{"itemHrid":"/items/rainbow_sword","count":28}],"7":[{"itemHrid":"/items/coin","count":90000000},{"itemHrid":"/items/redwood_lumber","count":4800},{"itemHrid":"/items/arcane_lumber","count":4800},{"itemHrid":"/items/rainbow_mace","count":64},{"itemHrid":"/items/holy_mace","count":64},{"itemHrid":"/items/rainbow_sword","count":32},{"itemHrid":"/items/holy_sword","count":32}],"8":[{"itemHrid":"/items/coin","count":160000000},{"itemHrid":"/items/arcane_lumber","count":12000},{"itemHrid":"/items/holy_mace","count":160},{"itemHrid":"/items/holy_sword","count":80},{"itemHrid":"/items/super_power_coffee","count":2000}]},"sortIndex":13},"/house_rooms/kitchen":{"hrid":"/house_rooms/kitchen","name":"Kitchen","skillHrid":"/skills/cooking","usableInActionTypeMap":{"/action_types/cooking":true},"actionBuffs":[{"uniqueHrid":"/buff_uniques/house_efficiency","typeHrid":"/buff_types/efficiency","ratioBoost":0,"ratioBoostLevelBonus":0,"flatBoost":0.015,"flatBoostLevelBonus":0.015,"startTime":"0001-01-01T00:00:00Z","duration":0}],"globalBuffs":[{"uniqueHrid":"/buff_uniques/house_experience","typeHrid":"/buff_types/wisdom","ratioBoost":0,"ratioBoostLevelBonus":0,"flatBoost":0.0005,"flatBoostLevelBonus":0.0005,"startTime":"0001-01-01T00:00:00Z","duration":0},{"uniqueHrid":"/buff_uniques/house_rare_find","typeHrid":"/buff_types/rare_find","ratioBoost":0,"ratioBoostLevelBonus":0,"flatBoost":0.002,"flatBoostLevelBonus":0.002,"startTime":"0001-01-01T00:00:00Z","duration":0}],"upgradeCostsMap":{"1":[{"itemHrid":"/items/coin","count":500000},{"itemHrid":"/items/lumber","count":75},{"itemHrid":"/items/sugar","count":2000},{"itemHrid":"/items/egg","count":500},{"itemHrid":"/items/wheat","count":500},{"itemHrid":"/items/cheese_spatula","count":6}],"2":[{"itemHrid":"/items/coin","count":2000000},{"itemHrid":"/items/lumber","count":150},{"itemHrid":"/items/birch_lumber","count":150},{"itemHrid":"/items/sugar","count":8000},{"itemHrid":"/items/egg","count":1000},{"itemHrid":"/items/blueberry","count":1000},{"itemHrid":"/items/wheat","count":1000},{"itemHrid":"/items/apple","count":500},{"itemHrid":"/items/cheese_spatula","count":9},{"itemHrid":"/items/verdant_spatula","count":9}],"3":[{"itemHrid":"/items/coin","count":5000000},{"itemHrid":"/items/birch_lumber","count":300},{"itemHrid":"/items/cedar_lumber","count":300},{"itemHrid":"/items/sugar","count":20000},{"itemHrid":"/items/blueberry","count":2000},{"itemHrid":"/items/blackberry","count":2000},{"itemHrid":"/items/apple","count":1000},{"itemHrid":"/items/orange","count":1000},{"itemHrid":"/items/verdant_spatula","count":12},{"itemHrid":"/items/azure_spatula","count":12}],"4":[{"itemHrid":"/items/coin","count":12000000},{"itemHrid":"/items/cedar_lumber","count":600},{"itemHrid":"/items/purpleheart_lumber","count":600},{"itemHrid":"/items/sugar","count":48000},{"itemHrid":"/items/blackberry","count":4000},{"itemHrid":"/items/strawberry","count":4000},{"itemHrid":"/items/orange","count":2000},{"itemHrid":"/items/plum","count":2000},{"itemHrid":"/items/azure_spatula","count":15},{"itemHrid":"/items/burble_spatula","count":15},{"itemHrid":"/items/cooking_tea","count":1000}],"5":[{"itemHrid":"/items/coin","count":25000000},{"itemHrid":"/items/purpleheart_lumber","count":1200},{"itemHrid":"/items/ginkgo_lumber","count":1200},{"itemHrid":"/items/sugar","count":100000},{"itemHrid":"/items/strawberry","count":8000},{"itemHrid":"/items/mooberry","count":8000},{"itemHrid":"/items/plum","count":4000},{"itemHrid":"/items/peach","count":4000},{"itemHrid":"/items/burble_spatula","count":18},{"itemHrid":"/items/crimson_spatula","count":18}],"6":[{"itemHrid":"/items/coin","count":50000000},{"itemHrid":"/items/ginkgo_lumber","count":2400},{"itemHrid":"/items/redwood_lumber","count":2400},{"itemHrid":"/items/sugar","count":200000},{"itemHrid":"/items/mooberry","count":16000},{"itemHrid":"/items/marsberry","count":16000},{"itemHrid":"/items/peach","count":8000},{"itemHrid":"/items/dragon_fruit","count":8000},{"itemHrid":"/items/crimson_spatula","count":21},{"itemHrid":"/items/rainbow_spatula","count":21}],"7":[{"itemHrid":"/items/coin","count":90000000},{"itemHrid":"/items/redwood_lumber","count":4800},{"itemHrid":"/items/arcane_lumber","count":4800},{"itemHrid":"/items/sugar","count":360000},{"itemHrid":"/items/marsberry","count":32000},{"itemHrid":"/items/spaceberry","count":32000},{"itemHrid":"/items/dragon_fruit","count":16000},{"itemHrid":"/items/star_fruit","count":16000},{"itemHrid":"/items/rainbow_spatula","count":24},{"itemHrid":"/items/holy_spatula","count":24}],"8":[{"itemHrid":"/items/coin","count":160000000},{"itemHrid":"/items/arcane_lumber","count":12000},{"itemHrid":"/items/sugar","count":640000},{"itemHrid":"/items/spaceberry","count":80000},{"itemHrid":"/items/star_fruit","count":40000},{"itemHrid":"/items/holy_spatula","count":60},{"itemHrid":"/items/super_cooking_tea","count":2000}]},"sortIndex":7},"/house_rooms/laboratory":{"hrid":"/house_rooms/laboratory","name":"Laboratory","skillHrid":"/skills/enhancing","usableInActionTypeMap":{"/action_types/enhancing":true},"actionBuffs":[{"uniqueHrid":"/buff_uniques/house_action_speed","typeHrid":"/buff_types/action_speed","ratioBoost":0,"ratioBoostLevelBonus":0,"flatBoost":0.01,"flatBoostLevelBonus":0.01,"startTime":"0001-01-01T00:00:00Z","duration":0},{"uniqueHrid":"/buff_uniques/house_enhancing_success","typeHrid":"/buff_types/enhancing_success","ratioBoost":0.0005,"ratioBoostLevelBonus":0.0005,"flatBoost":0,"flatBoostLevelBonus":0,"startTime":"0001-01-01T00:00:00Z","duration":0}],"globalBuffs":[{"uniqueHrid":"/buff_uniques/house_experience","typeHrid":"/buff_types/wisdom","ratioBoost":0,"ratioBoostLevelBonus":0,"flatBoost":0.0005,"flatBoostLevelBonus":0.0005,"startTime":"0001-01-01T00:00:00Z","duration":0},{"uniqueHrid":"/buff_uniques/house_rare_find","typeHrid":"/buff_types/rare_find","ratioBoost":0,"ratioBoostLevelBonus":0,"flatBoost":0.002,"flatBoostLevelBonus":0.002,"startTime":"0001-01-01T00:00:00Z","duration":0}],"upgradeCostsMap":{"1":[{"itemHrid":"/items/coin","count":500000},{"itemHrid":"/items/lumber","count":75},{"itemHrid":"/items/swamp_essence","count":750},{"itemHrid":"/items/cheese_enhancer","count":6}],"2":[{"itemHrid":"/items/coin","count":2000000},{"itemHrid":"/items/lumber","count":150},{"itemHrid":"/items/birch_lumber","count":150},{"itemHrid":"/items/swamp_essence","count":1500},{"itemHrid":"/items/aqua_essence","count":1500},{"itemHrid":"/items/cheese_enhancer","count":9},{"itemHrid":"/items/verdant_enhancer","count":9}],"3":[{"itemHrid":"/items/coin","count":5000000},{"itemHrid":"/items/birch_lumber","count":300},{"itemHrid":"/items/cedar_lumber","count":300},{"itemHrid":"/items/aqua_essence","count":3000},{"itemHrid":"/items/jungle_essence","count":3000},{"itemHrid":"/items/verdant_enhancer","count":12},{"itemHrid":"/items/azure_enhancer","count":12}],"4":[{"itemHrid":"/items/coin","count":12000000},{"itemHrid":"/items/cedar_lumber","count":600},{"itemHrid":"/items/purpleheart_lumber","count":600},{"itemHrid":"/items/jungle_essence","count":6000},{"itemHrid":"/items/gobo_essence","count":6000},{"itemHrid":"/items/azure_enhancer","count":15},{"itemHrid":"/items/burble_enhancer","count":15},{"itemHrid":"/items/enhancing_tea","count":1000}],"5":[{"itemHrid":"/items/coin","count":25000000},{"itemHrid":"/items/purpleheart_lumber","count":1200},{"itemHrid":"/items/ginkgo_lumber","count":1200},{"itemHrid":"/items/gobo_essence","count":12000},{"itemHrid":"/items/eyessence","count":12000},{"itemHrid":"/items/burble_enhancer","count":18},{"itemHrid":"/items/crimson_enhancer","count":18}],"6":[{"itemHrid":"/items/coin","count":50000000},{"itemHrid":"/items/ginkgo_lumber","count":2400},{"itemHrid":"/items/redwood_lumber","count":2400},{"itemHrid":"/items/eyessence","count":24000},{"itemHrid":"/items/sorcerer_essence","count":24000},{"itemHrid":"/items/crimson_enhancer","count":21},{"itemHrid":"/items/rainbow_enhancer","count":21}],"7":[{"itemHrid":"/items/coin","count":90000000},{"itemHrid":"/items/redwood_lumber","count":4800},{"itemHrid":"/items/arcane_lumber","count":4800},{"itemHrid":"/items/sorcerer_essence","count":48000},{"itemHrid":"/items/bear_essence","count":48000},{"itemHrid":"/items/rainbow_enhancer","count":24},{"itemHrid":"/items/holy_enhancer","count":24}],"8":[{"itemHrid":"/items/coin","count":160000000},{"itemHrid":"/items/arcane_lumber","count":12000},{"itemHrid":"/items/bear_essence","count":120000},{"itemHrid":"/items/holy_enhancer","count":60},{"itemHrid":"/items/super_enhancing_tea","count":2000}]},"sortIndex":9},"/house_rooms/library":{"hrid":"/house_rooms/library","name":"Library","skillHrid":"/skills/intelligence","usableInActionTypeMap":{"/action_types/combat":true},"actionBuffs":[{"uniqueHrid":"/buff_uniques/house_intelligence_level","typeHrid":"/buff_types/intelligence_level","ratioBoost":0,"ratioBoostLevelBonus":0,"flatBoost":1,"flatBoostLevelBonus":1,"startTime":"0001-01-01T00:00:00Z","duration":0},{"uniqueHrid":"/buff_uniques/house_mp_regen","typeHrid":"/buff_types/mp_regen","ratioBoost":0,"ratioBoostLevelBonus":0,"flatBoost":0.0003,"flatBoostLevelBonus":0.0003,"startTime":"0001-01-01T00:00:00Z","duration":0}],"globalBuffs":[{"uniqueHrid":"/buff_uniques/house_experience","typeHrid":"/buff_types/wisdom","ratioBoost":0,"ratioBoostLevelBonus":0,"flatBoost":0.0005,"flatBoostLevelBonus":0.0005,"startTime":"0001-01-01T00:00:00Z","duration":0},{"uniqueHrid":"/buff_uniques/house_rare_find","typeHrid":"/buff_types/rare_find","ratioBoost":0,"ratioBoostLevelBonus":0,"flatBoost":0.002,"flatBoostLevelBonus":0.002,"startTime":"0001-01-01T00:00:00Z","duration":0}],"upgradeCostsMap":{"1":[{"itemHrid":"/items/coin","count":500000},{"itemHrid":"/items/lumber","count":75},{"itemHrid":"/items/gummy","count":250},{"itemHrid":"/items/yogurt","count":250},{"itemHrid":"/items/poke","count":2},{"itemHrid":"/items/scratch","count":2},{"itemHrid":"/items/smack","count":2}],"2":[{"itemHrid":"/items/coin","count":2000000},{"itemHrid":"/items/lumber","count":150},{"itemHrid":"/items/birch_lumber","count":150},{"itemHrid":"/items/gummy","count":500},{"itemHrid":"/items/apple_gummy","count":250},{"itemHrid":"/items/yogurt","count":500},{"itemHrid":"/items/apple_yogurt","count":250},{"itemHrid":"/items/quick_shot","count":2},{"itemHrid":"/items/water_strike","count":2},{"itemHrid":"/items/entangle","count":2},{"itemHrid":"/items/fireball","count":2}],"3":[{"itemHrid":"/items/coin","count":5000000},{"itemHrid":"/items/birch_lumber","count":300},{"itemHrid":"/items/cedar_lumber","count":300},{"itemHrid":"/items/apple_gummy","count":500},{"itemHrid":"/items/orange_gummy","count":500},{"itemHrid":"/items/apple_yogurt","count":500},{"itemHrid":"/items/orange_yogurt","count":500},{"itemHrid":"/items/toughness","count":2},{"itemHrid":"/items/precision","count":2}],"4":[{"itemHrid":"/items/coin","count":12000000},{"itemHrid":"/items/cedar_lumber","count":600},{"itemHrid":"/items/purpleheart_lumber","count":600},{"itemHrid":"/items/orange_gummy","count":1000},{"itemHrid":"/items/plum_gummy","count":1000},{"itemHrid":"/items/orange_yogurt","count":1000},{"itemHrid":"/items/plum_yogurt","count":1000},{"itemHrid":"/items/pierce","count":2},{"itemHrid":"/items/cleave","count":2},{"itemHrid":"/items/sweep","count":2},{"itemHrid":"/items/intelligence_coffee","count":1000}],"5":[{"itemHrid":"/items/coin","count":25000000},{"itemHrid":"/items/purpleheart_lumber","count":1200},{"itemHrid":"/items/ginkgo_lumber","count":1200},{"itemHrid":"/items/plum_gummy","count":2000},{"itemHrid":"/items/peach_gummy","count":2000},{"itemHrid":"/items/plum_yogurt","count":2000},{"itemHrid":"/items/peach_yogurt","count":2000},{"itemHrid":"/items/rain_of_arrows","count":2},{"itemHrid":"/items/ice_spear","count":2},{"itemHrid":"/items/flame_blast","count":2},{"itemHrid":"/items/toxic_pollen","count":2}],"6":[{"itemHrid":"/items/coin","count":50000000},{"itemHrid":"/items/ginkgo_lumber","count":2400},{"itemHrid":"/items/redwood_lumber","count":2400},{"itemHrid":"/items/peach_gummy","count":4000},{"itemHrid":"/items/dragon_fruit_gummy","count":4000},{"itemHrid":"/items/peach_yogurt","count":4000},{"itemHrid":"/items/dragon_fruit_yogurt","count":4000},{"itemHrid":"/items/berserk","count":2},{"itemHrid":"/items/frenzy","count":2},{"itemHrid":"/items/elemental_affinity","count":2}],"7":[{"itemHrid":"/items/coin","count":90000000},{"itemHrid":"/items/redwood_lumber","count":4800},{"itemHrid":"/items/arcane_lumber","count":4800},{"itemHrid":"/items/dragon_fruit_gummy","count":8000},{"itemHrid":"/items/star_fruit_gummy","count":8000},{"itemHrid":"/items/dragon_fruit_yogurt","count":8000},{"itemHrid":"/items/star_fruit_yogurt","count":8000},{"itemHrid":"/items/puncture","count":2},{"itemHrid":"/items/maim","count":2},{"itemHrid":"/items/stunning_blow","count":2}],"8":[{"itemHrid":"/items/coin","count":160000000},{"itemHrid":"/items/arcane_lumber","count":12000},{"itemHrid":"/items/star_fruit_gummy","count":20000},{"itemHrid":"/items/star_fruit_yogurt","count":20000},{"itemHrid":"/items/silencing_shot","count":2},{"itemHrid":"/items/frost_surge","count":2},{"itemHrid":"/items/natures_veil","count":2},{"itemHrid":"/items/firestorm","count":2},{"itemHrid":"/items/super_intelligence_coffee","count":2000}]},"sortIndex":11},"/house_rooms/log_shed":{"hrid":"/house_rooms/log_shed","name":"Log Shed","skillHrid":"/skills/woodcutting","usableInActionTypeMap":{"/action_types/woodcutting":true},"actionBuffs":[{"uniqueHrid":"/buff_uniques/house_efficiency","typeHrid":"/buff_types/efficiency","ratioBoost":0,"ratioBoostLevelBonus":0,"flatBoost":0.015,"flatBoostLevelBonus":0.015,"startTime":"0001-01-01T00:00:00Z","duration":0}],"globalBuffs":[{"uniqueHrid":"/buff_uniques/house_experience","typeHrid":"/buff_types/wisdom","ratioBoost":0,"ratioBoostLevelBonus":0,"flatBoost":0.0005,"flatBoostLevelBonus":0.0005,"startTime":"0001-01-01T00:00:00Z","duration":0},{"uniqueHrid":"/buff_uniques/house_rare_find","typeHrid":"/buff_types/rare_find","ratioBoost":0,"ratioBoostLevelBonus":0,"flatBoost":0.002,"flatBoostLevelBonus":0.002,"startTime":"0001-01-01T00:00:00Z","duration":0}],"upgradeCostsMap":{"1":[{"itemHrid":"/items/coin","count":500000},{"itemHrid":"/items/lumber","count":75},{"itemHrid":"/items/log","count":1500},{"itemHrid":"/items/cheese_hatchet","count":6}],"2":[{"itemHrid":"/items/coin","count":2000000},{"itemHrid":"/items/lumber","count":150},{"itemHrid":"/items/birch_lumber","count":150},{"itemHrid":"/items/log","count":3000},{"itemHrid":"/items/birch_log","count":3000},{"itemHrid":"/items/cheese_hatchet","count":9},{"itemHrid":"/items/verdant_hatchet","count":9}],"3":[{"itemHrid":"/items/coin","count":5000000},{"itemHrid":"/items/birch_lumber","count":300},{"itemHrid":"/items/cedar_lumber","count":300},{"itemHrid":"/items/birch_log","count":6000},{"itemHrid":"/items/cedar_log","count":6000},{"itemHrid":"/items/verdant_hatchet","count":12},{"itemHrid":"/items/azure_hatchet","count":12}],"4":[{"itemHrid":"/items/coin","count":12000000},{"itemHrid":"/items/cedar_lumber","count":600},{"itemHrid":"/items/purpleheart_lumber","count":600},{"itemHrid":"/items/cedar_log","count":12000},{"itemHrid":"/items/purpleheart_log","count":12000},{"itemHrid":"/items/azure_hatchet","count":15},{"itemHrid":"/items/burble_hatchet","count":15},{"itemHrid":"/items/woodcutting_tea","count":1000}],"5":[{"itemHrid":"/items/coin","count":25000000},{"itemHrid":"/items/purpleheart_lumber","count":1200},{"itemHrid":"/items/ginkgo_lumber","count":1200},{"itemHrid":"/items/purpleheart_log","count":24000},{"itemHrid":"/items/ginkgo_log","count":24000},{"itemHrid":"/items/burble_hatchet","count":18},{"itemHrid":"/items/crimson_hatchet","count":18}],"6":[{"itemHrid":"/items/coin","count":50000000},{"itemHrid":"/items/ginkgo_lumber","count":2400},{"itemHrid":"/items/redwood_lumber","count":2400},{"itemHrid":"/items/ginkgo_log","count":48000},{"itemHrid":"/items/redwood_log","count":48000},{"itemHrid":"/items/crimson_hatchet","count":21},{"itemHrid":"/items/rainbow_hatchet","count":21}],"7":[{"itemHrid":"/items/coin","count":90000000},{"itemHrid":"/items/redwood_lumber","count":4800},{"itemHrid":"/items/arcane_lumber","count":4800},{"itemHrid":"/items/redwood_log","count":96000},{"itemHrid":"/items/arcane_log","count":96000},{"itemHrid":"/items/rainbow_hatchet","count":24},{"itemHrid":"/items/holy_hatchet","count":24}],"8":[{"itemHrid":"/items/coin","count":160000000},{"itemHrid":"/items/arcane_lumber","count":12000},{"itemHrid":"/items/arcane_log","count":240000},{"itemHrid":"/items/holy_hatchet","count":60},{"itemHrid":"/items/super_woodcutting_tea","count":2000}]},"sortIndex":3},"/house_rooms/mystical_study":{"hrid":"/house_rooms/mystical_study","name":"Mystical Study","skillHrid":"/skills/magic","usableInActionTypeMap":{"/action_types/combat":true},"actionBuffs":[{"uniqueHrid":"/buff_uniques/house_magic_level","typeHrid":"/buff_types/magic_level","ratioBoost":0,"ratioBoostLevelBonus":0,"flatBoost":1,"flatBoostLevelBonus":1,"startTime":"0001-01-01T00:00:00Z","duration":0}],"globalBuffs":[{"uniqueHrid":"/buff_uniques/house_experience","typeHrid":"/buff_types/wisdom","ratioBoost":0,"ratioBoostLevelBonus":0,"flatBoost":0.0005,"flatBoostLevelBonus":0.0005,"startTime":"0001-01-01T00:00:00Z","duration":0},{"uniqueHrid":"/buff_uniques/house_rare_find","typeHrid":"/buff_types/rare_find","ratioBoost":0,"ratioBoostLevelBonus":0,"flatBoost":0.002,"flatBoostLevelBonus":0.002,"startTime":"0001-01-01T00:00:00Z","duration":0}],"upgradeCostsMap":{"1":[{"itemHrid":"/items/coin","count":500000},{"itemHrid":"/items/lumber","count":75},{"itemHrid":"/items/wooden_water_staff","count":4},{"itemHrid":"/items/wooden_nature_staff","count":4},{"itemHrid":"/items/wooden_fire_staff","count":4},{"itemHrid":"/items/cotton_hat","count":4},{"itemHrid":"/items/cotton_robe_top","count":4},{"itemHrid":"/items/cotton_robe_bottoms","count":4},{"itemHrid":"/items/cotton_gloves","count":4},{"itemHrid":"/items/cotton_boots","count":4}],"2":[{"itemHrid":"/items/coin","count":2000000},{"itemHrid":"/items/lumber","count":150},{"itemHrid":"/items/birch_lumber","count":150},{"itemHrid":"/items/wooden_water_staff","count":6},{"itemHrid":"/items/birch_water_staff","count":6},{"itemHrid":"/items/wooden_nature_staff","count":6},{"itemHrid":"/items/birch_nature_staff","count":6},{"itemHrid":"/items/wooden_fire_staff","count":6},{"itemHrid":"/items/birch_fire_staff","count":6},{"itemHrid":"/items/linen_hat","count":8},{"itemHrid":"/items/linen_robe_top","count":8},{"itemHrid":"/items/linen_robe_bottoms","count":8},{"itemHrid":"/items/linen_gloves","count":8},{"itemHrid":"/items/linen_boots","count":8}],"3":[{"itemHrid":"/items/coin","count":5000000},{"itemHrid":"/items/birch_lumber","count":300},{"itemHrid":"/items/cedar_lumber","count":300},{"itemHrid":"/items/birch_water_staff","count":8},{"itemHrid":"/items/cedar_water_staff","count":8},{"itemHrid":"/items/birch_nature_staff","count":8},{"itemHrid":"/items/cedar_nature_staff","count":8},{"itemHrid":"/items/birch_fire_staff","count":8},{"itemHrid":"/items/cedar_fire_staff","count":8},{"itemHrid":"/items/linen_hat","count":16},{"itemHrid":"/items/linen_robe_top","count":16},{"itemHrid":"/items/linen_robe_bottoms","count":16},{"itemHrid":"/items/linen_gloves","count":16},{"itemHrid":"/items/linen_boots","count":16}],"4":[{"itemHrid":"/items/coin","count":12000000},{"itemHrid":"/items/cedar_lumber","count":600},{"itemHrid":"/items/purpleheart_lumber","count":600},{"itemHrid":"/items/cedar_water_staff","count":10},{"itemHrid":"/items/purpleheart_water_staff","count":10},{"itemHrid":"/items/cedar_nature_staff","count":10},{"itemHrid":"/items/purpleheart_nature_staff","count":10},{"itemHrid":"/items/cedar_fire_staff","count":10},{"itemHrid":"/items/purpleheart_fire_staff","count":10},{"itemHrid":"/items/bamboo_hat","count":16},{"itemHrid":"/items/bamboo_robe_top","count":16},{"itemHrid":"/items/bamboo_robe_bottoms","count":16},{"itemHrid":"/items/bamboo_gloves","count":16},{"itemHrid":"/items/bamboo_boots","count":16},{"itemHrid":"/items/magic_coffee","count":1000}],"5":[{"itemHrid":"/items/coin","count":25000000},{"itemHrid":"/items/purpleheart_lumber","count":1200},{"itemHrid":"/items/ginkgo_lumber","count":1200},{"itemHrid":"/items/purpleheart_water_staff","count":12},{"itemHrid":"/items/ginkgo_water_staff","count":12},{"itemHrid":"/items/purpleheart_nature_staff","count":12},{"itemHrid":"/items/ginkgo_nature_staff","count":12},{"itemHrid":"/items/purpleheart_fire_staff","count":12},{"itemHrid":"/items/ginkgo_fire_staff","count":12},{"itemHrid":"/items/bamboo_hat","count":32},{"itemHrid":"/items/bamboo_robe_top","count":32},{"itemHrid":"/items/bamboo_robe_bottoms","count":32},{"itemHrid":"/items/bamboo_gloves","count":32},{"itemHrid":"/items/bamboo_boots","count":32}],"6":[{"itemHrid":"/items/coin","count":50000000},{"itemHrid":"/items/ginkgo_lumber","count":2400},{"itemHrid":"/items/redwood_lumber","count":2400},{"itemHrid":"/items/ginkgo_water_staff","count":14},{"itemHrid":"/items/redwood_water_staff","count":14},{"itemHrid":"/items/ginkgo_nature_staff","count":14},{"itemHrid":"/items/redwood_nature_staff","count":14},{"itemHrid":"/items/ginkgo_fire_staff","count":14},{"itemHrid":"/items/redwood_fire_staff","count":14},{"itemHrid":"/items/silk_hat","count":24},{"itemHrid":"/items/silk_robe_top","count":24},{"itemHrid":"/items/silk_robe_bottoms","count":24},{"itemHrid":"/items/silk_gloves","count":24},{"itemHrid":"/items/silk_boots","count":24}],"7":[{"itemHrid":"/items/coin","count":90000000},{"itemHrid":"/items/redwood_lumber","count":4800},{"itemHrid":"/items/arcane_lumber","count":4800},{"itemHrid":"/items/redwood_water_staff","count":16},{"itemHrid":"/items/arcane_water_staff","count":16},{"itemHrid":"/items/redwood_nature_staff","count":16},{"itemHrid":"/items/arcane_nature_staff","count":16},{"itemHrid":"/items/redwood_fire_staff","count":16},{"itemHrid":"/items/arcane_fire_staff","count":16},{"itemHrid":"/items/silk_hat","count":48},{"itemHrid":"/items/silk_robe_top","count":48},{"itemHrid":"/items/silk_robe_bottoms","count":48},{"itemHrid":"/items/silk_gloves","count":48},{"itemHrid":"/items/silk_boots","count":48}],"8":[{"itemHrid":"/items/coin","count":160000000},{"itemHrid":"/items/arcane_lumber","count":12000},{"itemHrid":"/items/arcane_water_staff","count":40},{"itemHrid":"/items/arcane_nature_staff","count":40},{"itemHrid":"/items/arcane_fire_staff","count":40},{"itemHrid":"/items/radiant_hat","count":40},{"itemHrid":"/items/radiant_robe_top","count":40},{"itemHrid":"/items/radiant_robe_bottoms","count":40},{"itemHrid":"/items/radiant_gloves","count":40},{"itemHrid":"/items/radiant_boots","count":40},{"itemHrid":"/items/super_magic_coffee","count":2000}]},"sortIndex":16},"/house_rooms/sewing_parlor":{"hrid":"/house_rooms/sewing_parlor","name":"Sewing Parlor","skillHrid":"/skills/tailoring","usableInActionTypeMap":{"/action_types/tailoring":true},"actionBuffs":[{"uniqueHrid":"/buff_uniques/house_efficiency","typeHrid":"/buff_types/efficiency","ratioBoost":0,"ratioBoostLevelBonus":0,"flatBoost":0.015,"flatBoostLevelBonus":0.015,"startTime":"0001-01-01T00:00:00Z","duration":0}],"globalBuffs":[{"uniqueHrid":"/buff_uniques/house_experience","typeHrid":"/buff_types/wisdom","ratioBoost":0,"ratioBoostLevelBonus":0,"flatBoost":0.0005,"flatBoostLevelBonus":0.0005,"startTime":"0001-01-01T00:00:00Z","duration":0},{"uniqueHrid":"/buff_uniques/house_rare_find","typeHrid":"/buff_types/rare_find","ratioBoost":0,"ratioBoostLevelBonus":0,"flatBoost":0.002,"flatBoostLevelBonus":0.002,"startTime":"0001-01-01T00:00:00Z","duration":0}],"upgradeCostsMap":{"1":[{"itemHrid":"/items/coin","count":500000},{"itemHrid":"/items/lumber","count":75},{"itemHrid":"/items/rough_leather","count":180},{"itemHrid":"/items/cotton_fabric","count":180},{"itemHrid":"/items/cheese_needle","count":6}],"2":[{"itemHrid":"/items/coin","count":2000000},{"itemHrid":"/items/lumber","count":150},{"itemHrid":"/items/birch_lumber","count":150},{"itemHrid":"/items/rough_leather","count":360},{"itemHrid":"/items/reptile_leather","count":360},{"itemHrid":"/items/cotton_fabric","count":360},{"itemHrid":"/items/linen_fabric","count":360},{"itemHrid":"/items/cheese_needle","count":9},{"itemHrid":"/items/verdant_needle","count":9}],"3":[{"itemHrid":"/items/coin","count":5000000},{"itemHrid":"/items/birch_lumber","count":300},{"itemHrid":"/items/cedar_lumber","count":300},{"itemHrid":"/items/reptile_leather","count":1440},{"itemHrid":"/items/linen_fabric","count":1440},{"itemHrid":"/items/verdant_needle","count":12},{"itemHrid":"/items/azure_needle","count":12}],"4":[{"itemHrid":"/items/coin","count":12000000},{"itemHrid":"/items/cedar_lumber","count":600},{"itemHrid":"/items/purpleheart_lumber","count":600},{"itemHrid":"/items/reptile_leather","count":1440},{"itemHrid":"/items/gobo_leather","count":1440},{"itemHrid":"/items/linen_fabric","count":1440},{"itemHrid":"/items/bamboo_fabric","count":1440},{"itemHrid":"/items/azure_needle","count":15},{"itemHrid":"/items/burble_needle","count":15},{"itemHrid":"/items/tailoring_tea","count":1000}],"5":[{"itemHrid":"/items/coin","count":25000000},{"itemHrid":"/items/purpleheart_lumber","count":1200},{"itemHrid":"/items/ginkgo_lumber","count":1200},{"itemHrid":"/items/gobo_leather","count":5760},{"itemHrid":"/items/bamboo_fabric","count":5760},{"itemHrid":"/items/burble_needle","count":18},{"itemHrid":"/items/crimson_needle","count":18}],"6":[{"itemHrid":"/items/coin","count":50000000},{"itemHrid":"/items/ginkgo_lumber","count":2400},{"itemHrid":"/items/redwood_lumber","count":2400},{"itemHrid":"/items/gobo_leather","count":5760},{"itemHrid":"/items/beast_leather","count":5760},{"itemHrid":"/items/bamboo_fabric","count":5760},{"itemHrid":"/items/silk_fabric","count":5760},{"itemHrid":"/items/crimson_needle","count":21},{"itemHrid":"/items/rainbow_needle","count":21}],"7":[{"itemHrid":"/items/coin","count":90000000},{"itemHrid":"/items/redwood_lumber","count":4800},{"itemHrid":"/items/arcane_lumber","count":4800},{"itemHrid":"/items/beast_leather","count":11520},{"itemHrid":"/items/umbral_leather","count":11520},{"itemHrid":"/items/silk_fabric","count":11520},{"itemHrid":"/items/radiant_fabric","count":11520},{"itemHrid":"/items/rainbow_needle","count":24},{"itemHrid":"/items/holy_needle","count":24}],"8":[{"itemHrid":"/items/coin","count":160000000},{"itemHrid":"/items/arcane_lumber","count":12000},{"itemHrid":"/items/umbral_leather","count":28800},{"itemHrid":"/items/radiant_fabric","count":28800},{"itemHrid":"/items/holy_needle","count":60},{"itemHrid":"/items/super_tailoring_tea","count":2000}]},"sortIndex":6},"/house_rooms/workshop":{"hrid":"/house_rooms/workshop","name":"Workshop","skillHrid":"/skills/crafting","usableInActionTypeMap":{"/action_types/crafting":true},"actionBuffs":[{"uniqueHrid":"/buff_uniques/house_efficiency","typeHrid":"/buff_types/efficiency","ratioBoost":0,"ratioBoostLevelBonus":0,"flatBoost":0.015,"flatBoostLevelBonus":0.015,"startTime":"0001-01-01T00:00:00Z","duration":0}],"globalBuffs":[{"uniqueHrid":"/buff_uniques/house_experience","typeHrid":"/buff_types/wisdom","ratioBoost":0,"ratioBoostLevelBonus":0,"flatBoost":0.0005,"flatBoostLevelBonus":0.0005,"startTime":"0001-01-01T00:00:00Z","duration":0},{"uniqueHrid":"/buff_uniques/house_rare_find","typeHrid":"/buff_types/rare_find","ratioBoost":0,"ratioBoostLevelBonus":0,"flatBoost":0.002,"flatBoostLevelBonus":0.002,"startTime":"0001-01-01T00:00:00Z","duration":0}],"upgradeCostsMap":{"1":[{"itemHrid":"/items/coin","count":500000},{"itemHrid":"/items/lumber","count":450},{"itemHrid":"/items/cheese_chisel","count":6}],"2":[{"itemHrid":"/items/coin","count":2000000},{"itemHrid":"/items/lumber","count":900},{"itemHrid":"/items/birch_lumber","count":900},{"itemHrid":"/items/cheese_chisel","count":9},{"itemHrid":"/items/verdant_chisel","count":9}],"3":[{"itemHrid":"/items/coin","count":5000000},{"itemHrid":"/items/birch_lumber","count":1800},{"itemHrid":"/items/cedar_lumber","count":1800},{"itemHrid":"/items/verdant_chisel","count":12},{"itemHrid":"/items/azure_chisel","count":12}],"4":[{"itemHrid":"/items/coin","count":12000000},{"itemHrid":"/items/cedar_lumber","count":3600},{"itemHrid":"/items/purpleheart_lumber","count":3600},{"itemHrid":"/items/azure_chisel","count":15},{"itemHrid":"/items/burble_chisel","count":15},{"itemHrid":"/items/crafting_tea","count":1000}],"5":[{"itemHrid":"/items/coin","count":25000000},{"itemHrid":"/items/purpleheart_lumber","count":7200},{"itemHrid":"/items/ginkgo_lumber","count":7200},{"itemHrid":"/items/burble_chisel","count":18},{"itemHrid":"/items/crimson_chisel","count":18}],"6":[{"itemHrid":"/items/coin","count":50000000},{"itemHrid":"/items/ginkgo_lumber","count":14400},{"itemHrid":"/items/redwood_lumber","count":14400},{"itemHrid":"/items/crimson_chisel","count":21},{"itemHrid":"/items/rainbow_chisel","count":21}],"7":[{"itemHrid":"/items/coin","count":90000000},{"itemHrid":"/items/redwood_lumber","count":28800},{"itemHrid":"/items/arcane_lumber","count":28800},{"itemHrid":"/items/rainbow_chisel","count":24},{"itemHrid":"/items/holy_chisel","count":24}],"8":[{"itemHrid":"/items/coin","count":160000000},{"itemHrid":"/items/arcane_lumber","count":72000},{"itemHrid":"/items/holy_chisel","count":60},{"itemHrid":"/items/super_crafting_tea","count":2000}]},"sortIndex":5}}');
+
+/***/ }),
+
 /***/ "./src/combatsimulator/data/itemDetailMap.json":
 /*!*****************************************************!*\
   !*** ./src/combatsimulator/data/itemDetailMap.json ***!
@@ -1273,16 +1357,20 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _combatsimulator_player_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./combatsimulator/player.js */ "./src/combatsimulator/player.js");
 /* harmony import */ var _combatsimulator_data_abilityDetailMap_json__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./combatsimulator/data/abilityDetailMap.json */ "./src/combatsimulator/data/abilityDetailMap.json");
 /* harmony import */ var _combatsimulator_data_itemDetailMap_json__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./combatsimulator/data/itemDetailMap.json */ "./src/combatsimulator/data/itemDetailMap.json");
-/* harmony import */ var _combatsimulator_ability_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./combatsimulator/ability.js */ "./src/combatsimulator/ability.js");
-/* harmony import */ var _combatsimulator_consumable_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./combatsimulator/consumable.js */ "./src/combatsimulator/consumable.js");
-/* harmony import */ var _combatsimulator_data_combatTriggerDependencyDetailMap_json__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./combatsimulator/data/combatTriggerDependencyDetailMap.json */ "./src/combatsimulator/data/combatTriggerDependencyDetailMap.json");
-/* harmony import */ var _combatsimulator_data_combatTriggerConditionDetailMap_json__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./combatsimulator/data/combatTriggerConditionDetailMap.json */ "./src/combatsimulator/data/combatTriggerConditionDetailMap.json");
-/* harmony import */ var _combatsimulator_data_combatTriggerComparatorDetailMap_json__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./combatsimulator/data/combatTriggerComparatorDetailMap.json */ "./src/combatsimulator/data/combatTriggerComparatorDetailMap.json");
-/* harmony import */ var _combatsimulator_data_abilitySlotsLevelRequirementList_json__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./combatsimulator/data/abilitySlotsLevelRequirementList.json */ "./src/combatsimulator/data/abilitySlotsLevelRequirementList.json");
-/* harmony import */ var _combatsimulator_data_actionDetailMap_json__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./combatsimulator/data/actionDetailMap.json */ "./src/combatsimulator/data/actionDetailMap.json");
-/* harmony import */ var _combatsimulator_data_combatMonsterDetailMap_json__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./combatsimulator/data/combatMonsterDetailMap.json */ "./src/combatsimulator/data/combatMonsterDetailMap.json");
-/* harmony import */ var _combatsimulator_data_damageTypeDetailMap_json__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./combatsimulator/data/damageTypeDetailMap.json */ "./src/combatsimulator/data/damageTypeDetailMap.json");
-/* harmony import */ var _combatsimulator_data_combatStyleDetailMap_json__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./combatsimulator/data/combatStyleDetailMap.json */ "./src/combatsimulator/data/combatStyleDetailMap.json");
+/* harmony import */ var _combatsimulator_data_houseRoomDetailMap_json__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./combatsimulator/data/houseRoomDetailMap.json */ "./src/combatsimulator/data/houseRoomDetailMap.json");
+/* harmony import */ var _combatsimulator_ability_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./combatsimulator/ability.js */ "./src/combatsimulator/ability.js");
+/* harmony import */ var _combatsimulator_consumable_js__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./combatsimulator/consumable.js */ "./src/combatsimulator/consumable.js");
+/* harmony import */ var _combatsimulator_houseRoom__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./combatsimulator/houseRoom */ "./src/combatsimulator/houseRoom.js");
+/* harmony import */ var _combatsimulator_data_combatTriggerDependencyDetailMap_json__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./combatsimulator/data/combatTriggerDependencyDetailMap.json */ "./src/combatsimulator/data/combatTriggerDependencyDetailMap.json");
+/* harmony import */ var _combatsimulator_data_combatTriggerConditionDetailMap_json__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./combatsimulator/data/combatTriggerConditionDetailMap.json */ "./src/combatsimulator/data/combatTriggerConditionDetailMap.json");
+/* harmony import */ var _combatsimulator_data_combatTriggerComparatorDetailMap_json__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./combatsimulator/data/combatTriggerComparatorDetailMap.json */ "./src/combatsimulator/data/combatTriggerComparatorDetailMap.json");
+/* harmony import */ var _combatsimulator_data_abilitySlotsLevelRequirementList_json__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./combatsimulator/data/abilitySlotsLevelRequirementList.json */ "./src/combatsimulator/data/abilitySlotsLevelRequirementList.json");
+/* harmony import */ var _combatsimulator_data_actionDetailMap_json__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./combatsimulator/data/actionDetailMap.json */ "./src/combatsimulator/data/actionDetailMap.json");
+/* harmony import */ var _combatsimulator_data_combatMonsterDetailMap_json__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./combatsimulator/data/combatMonsterDetailMap.json */ "./src/combatsimulator/data/combatMonsterDetailMap.json");
+/* harmony import */ var _combatsimulator_data_damageTypeDetailMap_json__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ./combatsimulator/data/damageTypeDetailMap.json */ "./src/combatsimulator/data/damageTypeDetailMap.json");
+/* harmony import */ var _combatsimulator_data_combatStyleDetailMap_json__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ./combatsimulator/data/combatStyleDetailMap.json */ "./src/combatsimulator/data/combatStyleDetailMap.json");
+
+
 
 
 
@@ -1372,6 +1460,51 @@ function initEquipmentSelect(equipmentType) {
     selectElement.addEventListener("change", (event) => {
         equipmentSelectHandler(event, equipmentType);
     });
+}
+
+function initHouseRoomsModal() {
+    let houseRoomsList = document.getElementById("houseRoomsList");
+    let newChildren = [];
+    let houseRooms = Object.values(_combatsimulator_data_houseRoomDetailMap_json__WEBPACK_IMPORTED_MODULE_4__).sort((a, b) => a.sortIndex - b.sortIndex);
+    player.houseRooms = {};
+
+    for (const room of Object.values(houseRooms)) {
+        player.houseRooms[room.hrid] = 0;
+
+        let row = createElement("div", "row mb-2");
+
+        let nameCol = createElement("div", "col-md-4 offset-md-3 align-self-center", room.name);
+        row.appendChild(nameCol);
+
+        let levelCol = createElement("div", "col-md-2");
+        let levelInput = createHouseInput(room.hrid);
+
+        levelInput.addEventListener("input", function (e) {
+            let inputValue = e.target.value;
+            const hrid = e.target.dataset.houseHrid;
+            player.houseRooms[hrid] = parseInt(inputValue);
+        });
+
+        levelCol.appendChild(levelInput);
+        row.appendChild(levelCol);
+
+        newChildren.push(row);
+    }
+
+    houseRoomsList.replaceChildren(...newChildren);
+}
+
+function createHouseInput(hrid) {
+    let levelInput = document.createElement("input");
+    levelInput.className = "form-control";
+    levelInput.type = "number";
+    levelInput.placeholder = 0;
+    levelInput.min = 0;
+    levelInput.max = 8;
+    levelInput.step = 1;
+    levelInput.dataset.houseHrid = hrid;
+
+    return levelInput;
 }
 
 function initEnhancementLevelInput(equipmentType) {
@@ -1514,10 +1647,10 @@ function updateCombatStatsUI() {
 
     let combatStyleElement = document.getElementById("combatStat_combatStyleHrid");
     let combatStyle = player.combatDetails.combatStats.combatStyleHrid;
-    combatStyleElement.innerHTML = _combatsimulator_data_combatStyleDetailMap_json__WEBPACK_IMPORTED_MODULE_13__[combatStyle].name;
+    combatStyleElement.innerHTML = _combatsimulator_data_combatStyleDetailMap_json__WEBPACK_IMPORTED_MODULE_15__[combatStyle].name;
 
     let damageTypeElement = document.getElementById("combatStat_damageType");
-    let damageType = _combatsimulator_data_damageTypeDetailMap_json__WEBPACK_IMPORTED_MODULE_12__[player.combatDetails.combatStats.damageType];
+    let damageType = _combatsimulator_data_damageTypeDetailMap_json__WEBPACK_IMPORTED_MODULE_14__[player.combatDetails.combatStats.damageType];
     damageTypeElement.innerHTML = damageType.name;
 
     let attackIntervalElement = document.getElementById("combatStat_attackInterval");
@@ -1748,9 +1881,9 @@ function updateAbilityUI() {
         let inputElement = document.getElementById("inputAbilityLevel_" + i);
         let triggerButton = document.getElementById("buttonAbilityTrigger_" + i);
 
-        selectElement.disabled = player.intelligenceLevel < _combatsimulator_data_abilitySlotsLevelRequirementList_json__WEBPACK_IMPORTED_MODULE_9__[i + 1];
-        inputElement.disabled = player.intelligenceLevel < _combatsimulator_data_abilitySlotsLevelRequirementList_json__WEBPACK_IMPORTED_MODULE_9__[i + 1];
-        triggerButton.disabled = player.intelligenceLevel < _combatsimulator_data_abilitySlotsLevelRequirementList_json__WEBPACK_IMPORTED_MODULE_9__[i + 1] || !abilities[i];
+        selectElement.disabled = player.intelligenceLevel < _combatsimulator_data_abilitySlotsLevelRequirementList_json__WEBPACK_IMPORTED_MODULE_11__[i + 1];
+        inputElement.disabled = player.intelligenceLevel < _combatsimulator_data_abilitySlotsLevelRequirementList_json__WEBPACK_IMPORTED_MODULE_11__[i + 1];
+        triggerButton.disabled = player.intelligenceLevel < _combatsimulator_data_abilitySlotsLevelRequirementList_json__WEBPACK_IMPORTED_MODULE_11__[i + 1] || !abilities[i];
     }
 }
 
@@ -1943,7 +2076,7 @@ function updateTriggerModal() {
 
         triggerComparatorSelect.value = modalTriggers[i].comparatorHrid;
 
-        if (_combatsimulator_data_combatTriggerComparatorDetailMap_json__WEBPACK_IMPORTED_MODULE_8__[modalTriggers[i].comparatorHrid].allowValue) {
+        if (_combatsimulator_data_combatTriggerComparatorDetailMap_json__WEBPACK_IMPORTED_MODULE_10__[modalTriggers[i].comparatorHrid].allowValue) {
             showElement(triggerValueInput);
             triggerValueInput.value = modalTriggers[i].value;
         } else {
@@ -1959,7 +2092,7 @@ function fillTriggerDependencySelect(element) {
     element.length = 0;
     element.add(new Option("", ""));
 
-    for (const dependency of Object.values(_combatsimulator_data_combatTriggerDependencyDetailMap_json__WEBPACK_IMPORTED_MODULE_6__).sort(
+    for (const dependency of Object.values(_combatsimulator_data_combatTriggerDependencyDetailMap_json__WEBPACK_IMPORTED_MODULE_8__).sort(
         (a, b) => a.sortIndex - b.sortIndex
     )) {
         element.add(new Option(dependency.name, dependency.hrid));
@@ -1967,13 +2100,13 @@ function fillTriggerDependencySelect(element) {
 }
 
 function fillTriggerConditionSelect(element, dependencyHrid) {
-    let dependency = _combatsimulator_data_combatTriggerDependencyDetailMap_json__WEBPACK_IMPORTED_MODULE_6__[dependencyHrid];
+    let dependency = _combatsimulator_data_combatTriggerDependencyDetailMap_json__WEBPACK_IMPORTED_MODULE_8__[dependencyHrid];
 
     let conditions;
     if (dependency.isSingleTarget) {
-        conditions = Object.values(_combatsimulator_data_combatTriggerConditionDetailMap_json__WEBPACK_IMPORTED_MODULE_7__).filter((condition) => condition.isSingleTarget);
+        conditions = Object.values(_combatsimulator_data_combatTriggerConditionDetailMap_json__WEBPACK_IMPORTED_MODULE_9__).filter((condition) => condition.isSingleTarget);
     } else {
-        conditions = Object.values(_combatsimulator_data_combatTriggerConditionDetailMap_json__WEBPACK_IMPORTED_MODULE_7__).filter((condition) => condition.isMultiTarget);
+        conditions = Object.values(_combatsimulator_data_combatTriggerConditionDetailMap_json__WEBPACK_IMPORTED_MODULE_9__).filter((condition) => condition.isMultiTarget);
     }
 
     element.length = 0;
@@ -1985,9 +2118,9 @@ function fillTriggerConditionSelect(element, dependencyHrid) {
 }
 
 function fillTriggerComparatorSelect(element, conditionHrid) {
-    let condition = _combatsimulator_data_combatTriggerConditionDetailMap_json__WEBPACK_IMPORTED_MODULE_7__[conditionHrid];
+    let condition = _combatsimulator_data_combatTriggerConditionDetailMap_json__WEBPACK_IMPORTED_MODULE_9__[conditionHrid];
 
-    let comparators = condition.allowedComparatorHrids.map((hrid) => _combatsimulator_data_combatTriggerComparatorDetailMap_json__WEBPACK_IMPORTED_MODULE_8__[hrid]);
+    let comparators = condition.allowedComparatorHrids.map((hrid) => _combatsimulator_data_combatTriggerComparatorDetailMap_json__WEBPACK_IMPORTED_MODULE_10__[hrid]);
 
     element.length = 0;
     element.add(new Option("", ""));
@@ -2014,7 +2147,7 @@ function showElement(element) {
 function initZones() {
     let zoneSelect = document.getElementById("selectZone");
 
-    let gameZones = Object.values(_combatsimulator_data_actionDetailMap_json__WEBPACK_IMPORTED_MODULE_10__)
+    let gameZones = Object.values(_combatsimulator_data_actionDetailMap_json__WEBPACK_IMPORTED_MODULE_12__)
         .filter((action) => action.type == "/action_types/combat")
         .sort((a, b) => a.sortIndex - b.sortIndex);
 
@@ -2078,16 +2211,16 @@ function showKills(simResult) {
         let killsPerHour = (simResult.deaths[monster] / hoursSimulated).toFixed(1);
         let monsterRow = createRow(
             ["col-md-6", "col-md-6 text-end"],
-            [_combatsimulator_data_combatMonsterDetailMap_json__WEBPACK_IMPORTED_MODULE_11__[monster].name, killsPerHour]
+            [_combatsimulator_data_combatMonsterDetailMap_json__WEBPACK_IMPORTED_MODULE_13__[monster].name, killsPerHour]
         );
         newChildren.push(monsterRow);
 
         const dropMap = new Map();
         const rareDropMap = new Map();
-        for (const drop of _combatsimulator_data_combatMonsterDetailMap_json__WEBPACK_IMPORTED_MODULE_11__[monster].dropTable) {
+        for (const drop of _combatsimulator_data_combatMonsterDetailMap_json__WEBPACK_IMPORTED_MODULE_13__[monster].dropTable) {
             dropMap.set(_combatsimulator_data_itemDetailMap_json__WEBPACK_IMPORTED_MODULE_3__[drop.itemHrid]['name'], { "dropRate": drop.dropRate * dropRateMultiplier, "number": 0, "dropMin": drop.minCount, "dropMax": drop.maxCount, "noRngDropAmount": 0 });
         }
-        for (const drop of _combatsimulator_data_combatMonsterDetailMap_json__WEBPACK_IMPORTED_MODULE_11__[monster].rareDropTable) {
+        for (const drop of _combatsimulator_data_combatMonsterDetailMap_json__WEBPACK_IMPORTED_MODULE_13__[monster].rareDropTable) {
             rareDropMap.set(_combatsimulator_data_itemDetailMap_json__WEBPACK_IMPORTED_MODULE_3__[drop.itemHrid]['name'], { "dropRate": drop.dropRate * rareFindMultiplier, "number": 0, "dropMin": drop.minCount, "dropMax": drop.maxCount, "noRngDropAmount": 0 });
         }
 
@@ -2532,7 +2665,7 @@ function showDamageDone(simResult) {
         let resultAccordionButton = document.getElementById(
             "buttonSimulationResultDamageDoneAccordionEnemy" + enemyIndex
         );
-        let targetName = _combatsimulator_data_combatMonsterDetailMap_json__WEBPACK_IMPORTED_MODULE_11__[target].name;
+        let targetName = _combatsimulator_data_combatMonsterDetailMap_json__WEBPACK_IMPORTED_MODULE_13__[target].name;
         resultAccordionButton.innerHTML = "<b>Damage Done (" + targetName + ")</b>";
 
         if (simResult.bossFightMonsters.includes(target)) {
@@ -2607,7 +2740,7 @@ function showDamageTaken(simResult) {
         let resultAccordionButton = document.getElementById(
             "buttonSimulationResultDamageTakenAccordionEnemy" + enemyIndex
         );
-        let sourceName = _combatsimulator_data_combatMonsterDetailMap_json__WEBPACK_IMPORTED_MODULE_11__[source].name;
+        let sourceName = _combatsimulator_data_combatMonsterDetailMap_json__WEBPACK_IMPORTED_MODULE_13__[source].name;
         resultAccordionButton.innerHTML = "<b>Damage Taken (" + sourceName + ")</b>";
 
         enemyIndex++;
@@ -2709,14 +2842,14 @@ function startSimulation() {
 
     for (let i = 0; i < 3; i++) {
         if (food[i] && i < player.combatDetails.combatStats.foodSlots) {
-            let consumable = new _combatsimulator_consumable_js__WEBPACK_IMPORTED_MODULE_5__["default"](food[i], triggerMap[food[i]]);
+            let consumable = new _combatsimulator_consumable_js__WEBPACK_IMPORTED_MODULE_6__["default"](food[i], triggerMap[food[i]]);
             player.food[i] = consumable;
         } else {
             player.food[i] = null;
         }
 
         if (drinks[i] && i < player.combatDetails.combatStats.drinkSlots) {
-            let consumable = new _combatsimulator_consumable_js__WEBPACK_IMPORTED_MODULE_5__["default"](drinks[i], triggerMap[drinks[i]]);
+            let consumable = new _combatsimulator_consumable_js__WEBPACK_IMPORTED_MODULE_6__["default"](drinks[i], triggerMap[drinks[i]]);
             player.drinks[i] = consumable;
         } else {
             player.drinks[i] = null;
@@ -2724,9 +2857,9 @@ function startSimulation() {
     }
 
     for (let i = 0; i < 4; i++) {
-        if (abilities[i] && player.intelligenceLevel >= _combatsimulator_data_abilitySlotsLevelRequirementList_json__WEBPACK_IMPORTED_MODULE_9__[i + 1]) {
+        if (abilities[i] && player.intelligenceLevel >= _combatsimulator_data_abilitySlotsLevelRequirementList_json__WEBPACK_IMPORTED_MODULE_11__[i + 1]) {
             let abilityLevelInput = document.getElementById("inputAbilityLevel_" + i);
-            let ability = new _combatsimulator_ability_js__WEBPACK_IMPORTED_MODULE_4__["default"](abilities[i], Number(abilityLevelInput.value), triggerMap[abilities[i]]);
+            let ability = new _combatsimulator_ability_js__WEBPACK_IMPORTED_MODULE_5__["default"](abilities[i], Number(abilityLevelInput.value), triggerMap[abilities[i]]);
             player.abilities[i] = ability;
         } else {
             player.abilities[i] = null;
@@ -2879,6 +3012,7 @@ function getEquipmentSetFromUI() {
         drinks: {},
         abilities: {},
         triggerMap: {},
+        houseRooms: {},
     };
 
     ["stamina", "intelligence", "attack", "power", "defense", "ranged", "magic"].forEach((skill) => {
@@ -2917,6 +3051,8 @@ function getEquipmentSetFromUI() {
 
     equipmentSet.triggerMap = triggerMap;
 
+    equipmentSet.houseRooms = player.houseRooms;
+
     return equipmentSet;
 }
 
@@ -2953,6 +3089,25 @@ function loadEquipmentSetIntoUI(equipmentSet) {
     }
 
     triggerMap = equipmentSet.triggerMap;
+
+    if (equipmentSet.houseRooms) {
+        for (const room in equipmentSet.houseRooms) {
+            const field = document.querySelector('[data-house-hrid="' + room + '"]');
+            if (equipmentSet.houseRooms[room]) {
+                field.value = equipmentSet.houseRooms[room];
+            } else {
+                field.value = '';
+            }
+        }
+        player.houseRooms = equipmentSet.houseRooms;
+    } else {
+        let houseRooms = Object.values(_combatsimulator_data_houseRoomDetailMap_json__WEBPACK_IMPORTED_MODULE_4__);
+        for (const room of Object.values(houseRooms)) {
+            const field = document.querySelector('[data-house-hrid="' + room.hrid + '"]');
+            field.value = '';
+            player.houseRooms[room.hrid] = 0;
+        }
+    }
 
     updateState();
     updateUI();
@@ -3021,6 +3176,7 @@ function initImportExportModal() {
             triggerMap: triggerMap,
             zone: zoneSelect.value,
             simulationTime: simulationTimeInput.value,
+            houseRooms: player.houseRooms
         };
         try {
             navigator.clipboard.writeText(JSON.stringify(state)).then(() => alert("Current set has been copied to clipboard."));
@@ -3096,6 +3252,25 @@ function initImportExportModal() {
 
         if (importSet.triggerMap) {
             triggerMap = importSet.triggerMap;
+        }
+
+        if (importSet.houseRooms) {
+            for (const room in importSet.houseRooms) {
+                const field = document.querySelector('[data-house-hrid="' + room + '"]');
+                if (importSet.houseRooms[room]) {
+                    field.value = importSet.houseRooms[room];
+                } else {
+                    field.value = '';
+                }
+            }
+            player.houseRooms = importSet.houseRooms;
+        } else {
+            let houseRooms = Object.values(_combatsimulator_data_houseRoomDetailMap_json__WEBPACK_IMPORTED_MODULE_4__);
+            for (const room of Object.values(houseRooms)) {
+                const field = document.querySelector('[data-house-hrid="' + room.hrid + '"]');
+                field.value = '';
+                player.houseRooms[room.hrid] = 0;
+            }
         }
 
         let zoneSelect = document.getElementById("selectZone");
@@ -3268,6 +3443,7 @@ darkModeToggle.addEventListener('change', () => {
 });
 
 initEquipmentSection();
+initHouseRoomsModal();
 initLevelSection();
 initFoodSection();
 initDrinksSection();

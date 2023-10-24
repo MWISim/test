@@ -19,6 +19,7 @@ class CombatUnit {
     abilities = [null, null, null, null];
     food = [null, null, null];
     drinks = [null, null, null];
+    houseRooms = [];
     dropTable = [];
     rareDropTable = [];
     abilityManaCosts = new Map();
@@ -109,6 +110,7 @@ class CombatUnit {
         },
     };
     combatBuffs = {};
+    houseBuffs = {};
 
     constructor() { }
 
@@ -259,7 +261,9 @@ class CombatUnit {
         this.combatDetails.combatStats.castSpeed += this.getBuffBoost("/buff_types/cast_speed").flatBoost;
 
         this.combatDetails.combatStats.combatDropRate += (1 + this.combatDetails.combatStats.combatDropRate) * this.getBuffBoost("/buff_types/combat_drop_rate").ratioBoost;
-        this.combatDetails.combatStats.combatRareFind += (1 + this.combatDetails.combatStats.combatRareFind) * this.getBuffBoost("/buff_types/combat_rare_find").ratioBoost;
+        let combatRareFindBoosts = this.getBuffBoost("/buff_types/rare_find");
+        this.combatDetails.combatStats.combatRareFind += combatRareFindBoosts.flatBoost;
+        this.combatDetails.combatStats.combatRareFind += (1 + this.combatDetails.combatStats.combatRareFind) * combatRareFindBoosts.ratioBoost;
     }
 
     addBuff(buff, currentTime) {
@@ -267,6 +271,24 @@ class CombatUnit {
         this.combatBuffs[buff.uniqueHrid] = buff;
 
         this.updateCombatDetails();
+    }
+
+    addHouseBuff(buff) {
+        if (this.houseBuffs[buff.typeHrid]) {
+            this.houseBuffs[buff.typeHrid].flatBoost += buff.flatBoost;
+            this.houseBuffs[buff.typeHrid].ratioBoost += buff.ratioBoost;
+        } else {
+            this.houseBuffs[buff.typeHrid] = buff;
+        }
+    }
+
+    generateHouseBuffs() {
+        for (let i = 0; i < this.houseRooms.length; i++) {
+            const houseRoom = this.houseRooms[i];
+            houseRoom.buffs.forEach(buff => {
+                this.addHouseBuff(buff);
+            });
+        }
     }
 
     removeExpiredBuffs(currentTime) {
@@ -281,7 +303,7 @@ class CombatUnit {
     }
 
     clearBuffs() {
-        this.combatBuffs = {};
+        this.combatBuffs = this.houseBuffs;
         this.updateCombatDetails();
     }
 
