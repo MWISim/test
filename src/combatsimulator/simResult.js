@@ -12,7 +12,7 @@ class SimResult {
         this.playerRanOutOfMana = false;
         this.manaUsed = {};
         this.timeSpentAlive = [];
-        this.bossFightMonsters = [];
+        this.bossSpawns = [];
     }
 
     addDeath(unit) {

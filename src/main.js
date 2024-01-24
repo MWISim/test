@@ -1299,7 +1299,7 @@ function showDamageDone(simResult) {
         let targetName = combatMonsterDetailMap[target].name;
         resultAccordionButton.innerHTML = "<b>Damage Done (" + targetName + ")</b>";
 
-        if (simResult.bossFightMonsters.includes(target)) {
+        if (simResult.bossSpawns.includes(target)) {
             let hoursSpentOnBoss = (aliveSecondsSimulated / 60 / 60).toFixed(2);
             let percentSpentOnBoss = (aliveSecondsSimulated / totalSecondsSimulated * 100).toFixed(2);
 

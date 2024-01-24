@@ -65,8 +65,10 @@ class CombatSimulator extends EventTarget {
         this.simResult.setDropRateMultipliers(this.players[0]);
         this.simResult.setManaUsed(this.players[0]);
 
-        if (this.zone.monsterSpawnInfo.bossFightMonsters) {
-            this.simResult.bossFightMonsters = this.zone.monsterSpawnInfo.bossFightMonsters;
+        if (this.zone.monsterSpawnInfo.bossSpawns) {
+            for (const boss in this.zone.monsterSpawnInfo.bossSpawns) {
+                this.simResult.bossSpawns.push(boss.combatMonsterHrid);
+            }
         }
 
         return this.simResult;

@@ -4,11 +4,15 @@ import combatMonsterDetailMap from "./data/combatMonsterDetailMap.json";
 import Drops from "./drops";
 
 class Monster extends CombatUnit {
-    constructor(hrid) {
+
+    isElite;
+
+    constructor(hrid, isElite = false) {
         super();
 
         this.isPlayer = false;
         this.hrid = hrid;
+        this.isElite = isElite;
 
         let gameMonster = combatMonsterDetailMap[this.hrid];
         if (!gameMonster) {
@@ -28,6 +32,10 @@ class Monster extends CombatUnit {
 
     updateCombatDetails() {
         let gameMonster = combatMonsterDetailMap[this.hrid];
+
+        if (this.isElite) {
+            gameMonster.combatDetails = gameMonster.eliteCombatDetails;
+        }
 
         this.staminaLevel = gameMonster.combatDetails.staminaLevel;
         this.intelligenceLevel = gameMonster.combatDetails.intelligenceLevel;
