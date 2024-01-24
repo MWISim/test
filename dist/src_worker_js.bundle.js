@@ -2519,24 +2519,38 @@ class Monster extends _combatUnit__WEBPACK_IMPORTED_MODULE_1__["default"] {
         let gameMonster = _data_combatMonsterDetailMap_json__WEBPACK_IMPORTED_MODULE_2__[this.hrid];
 
         if (this.isElite) {
-            gameMonster.combatDetails = gameMonster.eliteCombatDetails;
+            this.staminaLevel = gameMonster.eliteCombatDetails.staminaLevel;
+            this.intelligenceLevel = gameMonster.eliteCombatDetails.intelligenceLevel;
+            this.attackLevel = gameMonster.eliteCombatDetails.attackLevel;
+            this.powerLevel = gameMonster.eliteCombatDetails.powerLevel;
+            this.defenseLevel = gameMonster.eliteCombatDetails.defenseLevel;
+            this.rangedLevel = gameMonster.eliteCombatDetails.rangedLevel;
+            this.magicLevel = gameMonster.eliteCombatDetails.magicLevel;
+
+            this.combatDetails.combatStats.combatStyleHrid = gameMonster.eliteCombatDetails.combatStats.combatStyleHrids[0];
+
+            for (const [key, value] of Object.entries(gameMonster.eliteCombatDetails.combatStats)) {
+                this.combatDetails.combatStats[key] = value;
+            }
+
+            this.combatDetails.combatStats.attackInterval = gameMonster.eliteCombatDetails.attackInterval;
+        } else {
+            this.staminaLevel = gameMonster.combatDetails.staminaLevel;
+            this.intelligenceLevel = gameMonster.combatDetails.intelligenceLevel;
+            this.attackLevel = gameMonster.combatDetails.attackLevel;
+            this.powerLevel = gameMonster.combatDetails.powerLevel;
+            this.defenseLevel = gameMonster.combatDetails.defenseLevel;
+            this.rangedLevel = gameMonster.combatDetails.rangedLevel;
+            this.magicLevel = gameMonster.combatDetails.magicLevel;
+
+            this.combatDetails.combatStats.combatStyleHrid = gameMonster.combatDetails.combatStats.combatStyleHrids[0];
+
+            for (const [key, value] of Object.entries(gameMonster.combatDetails.combatStats)) {
+                this.combatDetails.combatStats[key] = value;
+            }
+
+            this.combatDetails.combatStats.attackInterval = gameMonster.combatDetails.attackInterval;
         }
-
-        this.staminaLevel = gameMonster.combatDetails.staminaLevel;
-        this.intelligenceLevel = gameMonster.combatDetails.intelligenceLevel;
-        this.attackLevel = gameMonster.combatDetails.attackLevel;
-        this.powerLevel = gameMonster.combatDetails.powerLevel;
-        this.defenseLevel = gameMonster.combatDetails.defenseLevel;
-        this.rangedLevel = gameMonster.combatDetails.rangedLevel;
-        this.magicLevel = gameMonster.combatDetails.magicLevel;
-
-        this.combatDetails.combatStats.combatStyleHrid = gameMonster.combatDetails.combatStats.combatStyleHrids[0];
-
-        for (const [key, value] of Object.entries(gameMonster.combatDetails.combatStats)) {
-            this.combatDetails.combatStats[key] = value;
-        }
-
-        this.combatDetails.combatStats.attackInterval = gameMonster.combatDetails.attackInterval;
 
         super.updateCombatDetails();
     }
