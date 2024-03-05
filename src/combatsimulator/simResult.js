@@ -13,6 +13,7 @@ class SimResult {
         this.manaUsed = {};
         this.timeSpentAlive = [];
         this.bossSpawns = [];
+        this.isElite = false;
     }
 
     addDeath(unit) {

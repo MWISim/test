@@ -259,7 +259,7 @@ class CombatUtilities {
         return { damageDone, didHit, reflectDamageDone, lifeStealHeal, manaLeechMana, experienceGained };
     }
 
-    static processHeal(source, abilityEffect) {
+    static processHeal(source, abilityEffect, target) {
         if (abilityEffect.combatStyleHrid != "/combat_styles/magic") {
             throw new Error("Heal ability effect not supported for combat style: " + abilityEffect.combatStyleHrid);
         }
@@ -274,7 +274,7 @@ class CombatUtilities {
         let maxHeal = healingAmplify * (baseHealRatio * magicMaxDamage + baseHealFlat);
 
         let heal = this.randomInt(minHeal, maxHeal);
-        let amountHealed = source.addHitpoints(heal);
+        let amountHealed = target.addHitpoints(heal);
 
         return amountHealed;
     }

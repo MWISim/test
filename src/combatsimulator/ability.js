@@ -15,6 +15,7 @@ class Ability {
         this.manaCost = gameAbility.manaCost;
         this.cooldownDuration = gameAbility.cooldownDuration;
         this.castDuration = gameAbility.castDuration;
+        this.isSpecialAbility = gameAbility.isSpecialAbility;
 
         this.abilityEffects = [];
 

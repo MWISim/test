@@ -481,7 +481,7 @@
                                 </button>
                             </div>
                         </div>
-                        <div class="row mb-3">
+                        <div class="row mb-2">
                             <div class="col-md-6">
                                 <select id="selectAbility_3" class="form-select">
                                     <option value="">Empty</option>
@@ -495,6 +495,24 @@
                                 <button id="buttonAbilityTrigger_3" class="btn btn-primary" type="button"
                                     data-bs-toggle="modal" data-bs-target="#triggerModal" data-bs-triggertype="ability"
                                     data-bs-triggerindex="3">
+                                    Trigger
+                                </button>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <select id="selectAbility_4" class="form-select">
+                                    <option value="">Empty</option>
+                                </select>
+                            </div>
+                            <div class="col">
+                                <input type="number" id="inputAbilityLevel_4" class="form-control" value="1" min="1"
+                                    max="400" required />
+                            </div>
+                            <div class="col-md-auto">
+                                <button id="buttonAbilityTrigger_4" class="btn btn-primary" type="button"
+                                    data-bs-toggle="modal" data-bs-target="#triggerModal" data-bs-triggertype="ability"
+                                    data-bs-triggerindex="4">
                                     Trigger
                                 </button>
                             </div>
@@ -742,6 +760,10 @@
                 <div class="row">
                     <div class="col-md-8">Cast Speed:</div>
                     <div class="col-md-4" id="combatStat_castSpeed"></div>
+                </div>
+                <div class="row">
+                    <div class="col-md-8">Threat:</div>
+                    <div class="col-md-4" id="combatStat_totalThreat"></div>
                 </div>
                 <!-- #endregion -->
             </div>
@@ -1425,6 +1447,18 @@
                 <div class="modal-body">
                     <div class="container-fluid">
                         <div class="row">
+                            <div class="col-12 mb-4">
+                                <h6>Mar 4th, 2024</h6>
+                                <ul>
+                                    <li>Updated Game Data</li>
+                                    <li>Added Special Ability Slot</li>
+                                    <li>Added Threat Calculations</li>
+                                    <li>Added Elite Only Abilities</li>
+                                    <li>Added Elite Only Drops</li>
+                                    <li>Added New Triggers</li>
+                                    <li>Added Support for Most New Abilities/Auras</li>
+                                </ul>
+                            </div>
                             <div class="col-12 mb-4">
                                 <h6>Jan 24th, 2024</h6>
                                 <ul>
