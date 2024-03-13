@@ -466,9 +466,11 @@ class CombatUnit {
                 this.addPermanentBuff(buff);
             });
         }
-        this.zoneBuffs.forEach(buff => {
-            this.addPermanentBuff(buff);
-        });
+        if (this.zoneBuffs) {
+            this.zoneBuffs.forEach(buff => {
+                this.addPermanentBuff(buff);
+            });
+        }
     }
 
     removeExpiredBuffs(currentTime) {
