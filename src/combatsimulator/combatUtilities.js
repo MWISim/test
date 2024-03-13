@@ -279,6 +279,17 @@ class CombatUtilities {
         return amountHealed;
     }
 
+    static processSpendHp(source, abilityEffect) {
+        let currentHp = source.combatDetails.currentHitpoints;
+        let spendHpRatio = abilityEffect.spendHpRatio;
+
+        let spentHp = Math.floor(currentHp * spendHpRatio);
+
+        source.combatDetails.currentHitpoints -= spentHp;
+
+        return spentHp;
+    }
+
     static calculateTickValue(totalValue, totalTicks, currentTick) {
         let currentSum = Math.floor((currentTick * totalValue) / totalTicks);
         let previousSum = Math.floor(((currentTick - 1) * totalValue) / totalTicks);
@@ -330,6 +341,10 @@ class CombatUtilities {
 
     static calculateMagicExperience(damage, damagePrevented) {
         return 0.4 + 0.083375 * (damage + 0.35 * damagePrevented)
+    }
+
+    static calculateHealingExperience(healed) {
+        return CombatUtilities.calculateMagicExperience(healed, 0) * 2;
     }
 }
 

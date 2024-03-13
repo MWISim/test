@@ -137,7 +137,7 @@ class CombatSimulator extends EventTarget {
     }
 
     processCombatStartEvent(event) {
-        this.players[0].generateHouseBuffs();
+        this.players[0].generatePermanentBuffs();
         this.players[0].reset(this.simulationTime);
         let regenTickEvent = new RegenTickEvent(this.simulationTime + REGEN_TICK_INTERVAL);
         this.eventQueue.addEvent(regenTickEvent);
@@ -671,8 +671,7 @@ class CombatSimulator extends EventTarget {
                     this.processAbilityHealEffect(source, ability, abilityEffect);
                     break;
                 case "/ability_effect_types/spend_hp":
-                    // TODO    
-                    //this.processAbilityHealEffect(source, ability, abilityEffect);
+                    this.processAbilitySpendHpEffect(source, ability, abilityEffect);
                     break;
                 case "/ability_effect_types/revive":
                     // TODO    
@@ -830,7 +829,7 @@ class CombatSimulator extends EventTarget {
             let targets = source.isPlayer ? this.players : this.enemies;
             for (const target of targets.filter((unit) => unit && unit.combatDetails.currentHitpoints > 0)) {
                 let amountHealed = CombatUtilities.processHeal(source, abilityEffect, target);
-                let experienceGained = CombatUtilities.calculateMagicExperience(amountHealed, 0);
+                let experienceGained = CombatUtilities.calculateHealingExperience(amountHealed);
 
                 this.simResult.addHitpointsGained(target, ability.hrid, amountHealed);
                 this.simResult.addExperienceGain(source, "magic", experienceGained);
@@ -848,7 +847,7 @@ class CombatSimulator extends EventTarget {
             }
 
             let amountHealed = CombatUtilities.processHeal(source, abilityEffect, healTarget);
-            let experienceGained = CombatUtilities.calculateMagicExperience(amountHealed, 0);
+            let experienceGained = CombatUtilities.calculateHealingExperience(amountHealed);
 
             this.simResult.addHitpointsGained(healTarget, ability.hrid, amountHealed);
             this.simResult.addExperienceGain(source, "magic", experienceGained);
@@ -860,10 +859,22 @@ class CombatSimulator extends EventTarget {
         }
 
         let amountHealed = CombatUtilities.processHeal(source, abilityEffect, source);
-        let experienceGained = CombatUtilities.calculateMagicExperience(amountHealed, 0);
+        let experienceGained = CombatUtilities.calculateHealingExperience(amountHealed);
 
         this.simResult.addHitpointsGained(source, ability.hrid, amountHealed);
         this.simResult.addExperienceGain(source, "magic", experienceGained);
+    }
+
+    processAbilitySpendHpEffect(source, ability, abilityEffect) {
+        if (abilityEffect.targetType != "self") {
+            throw new Error("Unsupported target type for spend hp ability effect: " + ability.hrid);
+        }
+
+        let hpSpent = CombatUtilities.processSpendHp(source, abilityEffect);
+        let experienceGained = CombatUtilities.calculateStaminaExperience(0, hpSpent);
+
+        this.simResult.addHitpointsSpent(source, ability.hrid, hpSpent);
+        this.simResult.addExperienceGain(source, "stamina", experienceGained);
     }
 }
 

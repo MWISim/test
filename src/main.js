@@ -807,6 +807,7 @@ function showSimulationResult(simResult) {
     showDeaths(simResult);
     showExperienceGained(simResult);
     showConsumablesUsed(simResult);
+    showHpSpent(simResult);
     showManaUsed(simResult);
     showHitpointsGained(simResult);
     showManapointsGained(simResult);
@@ -857,7 +858,7 @@ function showKills(simResult) {
             if (!simResult.isElite && drop.isEliteOnly) {
                 continue;
             }
-            dropMap.set(itemDetailMap[drop.itemHrid]['name'], { "dropRate": drop.dropRate * dropRateMultiplier, "number": 0, "dropMin": drop.minCount, "dropMax": drop.maxCount, "noRngDropAmount": 0 });
+            dropMap.set(itemDetailMap[drop.itemHrid]['name'], { "dropRate": Math.min(1, drop.dropRate * dropRateMultiplier), "number": 0, "dropMin": drop.minCount, "dropMax": drop.maxCount, "noRngDropAmount": 0 });
         }
         for (const drop of combatMonsterDetailMap[monster].rareDropTable) {
             if (!simResult.isElite && drop.isEliteOnly) {
@@ -1053,6 +1054,26 @@ function showExperienceGained(simResult) {
     });
 
     resultDiv.replaceChildren(...newChildren);
+}
+
+function showHpSpent(simResult) {
+    let hpSpentHeadingDiv = document.getElementById("simulationHpSpentHeading");
+    hpSpentHeadingDiv.classList.add("d-none");
+    let hpSpentDiv = document.getElementById("simulationHpSpent");
+    hpSpentDiv.classList.add("d-none");
+
+    if (simResult.hitpointsSpent["player"]) {
+        let hoursSimulated = simResult.simulatedTime / ONE_HOUR;
+        let hpSpentSources = [];
+        for (const source of Object.keys(simResult.hitpointsSpent["player"])) {
+            let hpSpentPerHour = (simResult.hitpointsSpent["player"][source] / hoursSimulated).toFixed(2);
+            let hpSpentRow = createRow(["col-md-6", "col-md-6 text-end"], [abilityDetailMap[source].name, hpSpentPerHour]);
+            hpSpentSources.push(hpSpentRow);
+        }
+        hpSpentDiv.replaceChildren(...hpSpentSources);
+        hpSpentHeadingDiv.classList.remove("d-none");
+        hpSpentDiv.classList.remove("d-none");
+    }
 }
 
 function showConsumablesUsed(simResult) {

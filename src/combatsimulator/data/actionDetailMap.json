@@ -10761,7 +10761,7 @@
                 "typeHrid": "/buff_types/combat_drop_rate",
                 "ratioBoost": 0,
                 "ratioBoostLevelBonus": 0,
-                "flatBoost": 0.1,
+                "flatBoost": 0.3,
                 "flatBoostLevelBonus": 0,
                 "startTime": "0001-01-01T00:00:00Z",
                 "duration": 0
@@ -10771,7 +10771,7 @@
                 "typeHrid": "/buff_types/wisdom",
                 "ratioBoost": 0,
                 "ratioBoostLevelBonus": 0,
-                "flatBoost": 0.05,
+                "flatBoost": 0.1,
                 "flatBoostLevelBonus": 0,
                 "startTime": "0001-01-01T00:00:00Z",
                 "duration": 0
@@ -10958,7 +10958,7 @@
                 "typeHrid": "/buff_types/combat_drop_rate",
                 "ratioBoost": 0,
                 "ratioBoostLevelBonus": 0,
-                "flatBoost": 0.2,
+                "flatBoost": 0.45,
                 "flatBoostLevelBonus": 0,
                 "startTime": "0001-01-01T00:00:00Z",
                 "duration": 0
@@ -10968,7 +10968,7 @@
                 "typeHrid": "/buff_types/wisdom",
                 "ratioBoost": 0,
                 "ratioBoostLevelBonus": 0,
-                "flatBoost": 0.1,
+                "flatBoost": 0.15,
                 "flatBoostLevelBonus": 0,
                 "startTime": "0001-01-01T00:00:00Z",
                 "duration": 0
@@ -11497,7 +11497,7 @@
                 "typeHrid": "/buff_types/combat_drop_rate",
                 "ratioBoost": 0,
                 "ratioBoostLevelBonus": 0,
-                "flatBoost": 0.1,
+                "flatBoost": 0.45,
                 "flatBoostLevelBonus": 0,
                 "startTime": "0001-01-01T00:00:00Z",
                 "duration": 0
@@ -11507,7 +11507,7 @@
                 "typeHrid": "/buff_types/wisdom",
                 "ratioBoost": 0,
                 "ratioBoostLevelBonus": 0,
-                "flatBoost": 0.05,
+                "flatBoost": 0.15,
                 "flatBoostLevelBonus": 0,
                 "startTime": "0001-01-01T00:00:00Z",
                 "duration": 0
@@ -11784,7 +11784,7 @@
                 "typeHrid": "/buff_types/combat_drop_rate",
                 "ratioBoost": 0,
                 "ratioBoostLevelBonus": 0,
-                "flatBoost": 0.3,
+                "flatBoost": 0.6,
                 "flatBoostLevelBonus": 0,
                 "startTime": "0001-01-01T00:00:00Z",
                 "duration": 0
@@ -11794,7 +11794,7 @@
                 "typeHrid": "/buff_types/wisdom",
                 "ratioBoost": 0,
                 "ratioBoostLevelBonus": 0,
-                "flatBoost": 0.15,
+                "flatBoost": 0.2,
                 "flatBoostLevelBonus": 0,
                 "startTime": "0001-01-01T00:00:00Z",
                 "duration": 0
@@ -12071,7 +12071,7 @@
                 "typeHrid": "/buff_types/combat_drop_rate",
                 "ratioBoost": 0,
                 "ratioBoostLevelBonus": 0,
-                "flatBoost": 0.3,
+                "flatBoost": 0.6,
                 "flatBoostLevelBonus": 0,
                 "startTime": "0001-01-01T00:00:00Z",
                 "duration": 0
@@ -12081,7 +12081,7 @@
                 "typeHrid": "/buff_types/wisdom",
                 "ratioBoost": 0,
                 "ratioBoostLevelBonus": 0,
-                "flatBoost": 0.15,
+                "flatBoost": 0.2,
                 "flatBoostLevelBonus": 0,
                 "startTime": "0001-01-01T00:00:00Z",
                 "duration": 0
@@ -12256,7 +12256,7 @@
                 "typeHrid": "/buff_types/combat_drop_rate",
                 "ratioBoost": 0,
                 "ratioBoostLevelBonus": 0,
-                "flatBoost": 0.1,
+                "flatBoost": 0.3,
                 "flatBoostLevelBonus": 0,
                 "startTime": "0001-01-01T00:00:00Z",
                 "duration": 0
@@ -12266,7 +12266,7 @@
                 "typeHrid": "/buff_types/wisdom",
                 "ratioBoost": 0,
                 "ratioBoostLevelBonus": 0,
-                "flatBoost": 0.05,
+                "flatBoost": 0.1,
                 "flatBoostLevelBonus": 0,
                 "startTime": "0001-01-01T00:00:00Z",
                 "duration": 0
@@ -12619,7 +12619,7 @@
                 "typeHrid": "/buff_types/combat_drop_rate",
                 "ratioBoost": 0,
                 "ratioBoostLevelBonus": 0,
-                "flatBoost": 0.2,
+                "flatBoost": 0.45,
                 "flatBoostLevelBonus": 0,
                 "startTime": "0001-01-01T00:00:00Z",
                 "duration": 0
@@ -12629,7 +12629,7 @@
                 "typeHrid": "/buff_types/wisdom",
                 "ratioBoost": 0,
                 "ratioBoostLevelBonus": 0,
-                "flatBoost": 0.1,
+                "flatBoost": 0.15,
                 "flatBoostLevelBonus": 0,
                 "startTime": "0001-01-01T00:00:00Z",
                 "duration": 0
@@ -12992,7 +12992,7 @@
                 "typeHrid": "/buff_types/combat_drop_rate",
                 "ratioBoost": 0,
                 "ratioBoostLevelBonus": 0,
-                "flatBoost": 0.1,
+                "flatBoost": 0.3,
                 "flatBoostLevelBonus": 0,
                 "startTime": "0001-01-01T00:00:00Z",
                 "duration": 0
@@ -13002,7 +13002,7 @@
                 "typeHrid": "/buff_types/wisdom",
                 "ratioBoost": 0,
                 "ratioBoostLevelBonus": 0,
-                "flatBoost": 0.05,
+                "flatBoost": 0.1,
                 "flatBoostLevelBonus": 0,
                 "startTime": "0001-01-01T00:00:00Z",
                 "duration": 0
@@ -13177,7 +13177,7 @@
                 "typeHrid": "/buff_types/combat_drop_rate",
                 "ratioBoost": 0,
                 "ratioBoostLevelBonus": 0,
-                "flatBoost": 0.2,
+                "flatBoost": 0.45,
                 "flatBoostLevelBonus": 0,
                 "startTime": "0001-01-01T00:00:00Z",
                 "duration": 0
@@ -13187,7 +13187,7 @@
                 "typeHrid": "/buff_types/wisdom",
                 "ratioBoost": 0,
                 "ratioBoostLevelBonus": 0,
-                "flatBoost": 0.1,
+                "flatBoost": 0.15,
                 "flatBoostLevelBonus": 0,
                 "startTime": "0001-01-01T00:00:00Z",
                 "duration": 0
@@ -13400,7 +13400,7 @@
                 "typeHrid": "/buff_types/combat_drop_rate",
                 "ratioBoost": 0,
                 "ratioBoostLevelBonus": 0,
-                "flatBoost": 0.1,
+                "flatBoost": 0.3,
                 "flatBoostLevelBonus": 0,
                 "startTime": "0001-01-01T00:00:00Z",
                 "duration": 0
@@ -13410,7 +13410,7 @@
                 "typeHrid": "/buff_types/wisdom",
                 "ratioBoost": 0,
                 "ratioBoostLevelBonus": 0,
-                "flatBoost": 0.05,
+                "flatBoost": 0.1,
                 "flatBoostLevelBonus": 0,
                 "startTime": "0001-01-01T00:00:00Z",
                 "duration": 0
@@ -13649,7 +13649,7 @@
                 "typeHrid": "/buff_types/combat_drop_rate",
                 "ratioBoost": 0,
                 "ratioBoostLevelBonus": 0,
-                "flatBoost": 0.3,
+                "flatBoost": 0.6,
                 "flatBoostLevelBonus": 0,
                 "startTime": "0001-01-01T00:00:00Z",
                 "duration": 0
@@ -13659,7 +13659,7 @@
                 "typeHrid": "/buff_types/wisdom",
                 "ratioBoost": 0,
                 "ratioBoostLevelBonus": 0,
-                "flatBoost": 0.15,
+                "flatBoost": 0.2,
                 "flatBoostLevelBonus": 0,
                 "startTime": "0001-01-01T00:00:00Z",
                 "duration": 0

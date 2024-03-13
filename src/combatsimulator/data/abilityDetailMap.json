@@ -76,8 +76,8 @@
                         "typeHrid": "/buff_types/water_amplify",
                         "ratioBoost": 0,
                         "ratioBoostLevelBonus": 0,
-                        "flatBoost": 0.06,
-                        "flatBoostLevelBonus": 0.0006,
+                        "flatBoost": 0.08,
+                        "flatBoostLevelBonus": 0.0016,
                         "startTime": "0001-01-01T00:00:00Z",
                         "duration": 120000000000
                     },
@@ -87,7 +87,7 @@
                         "ratioBoost": 0,
                         "ratioBoostLevelBonus": 0,
                         "flatBoost": 4,
-                        "flatBoostLevelBonus": 0.04,
+                        "flatBoostLevelBonus": 0.08,
                         "startTime": "0001-01-01T00:00:00Z",
                         "duration": 120000000000
                     }
@@ -241,7 +241,7 @@
                         "ratioBoost": 0,
                         "ratioBoostLevelBonus": 0,
                         "flatBoost": 0.03,
-                        "flatBoostLevelBonus": 0.0003,
+                        "flatBoostLevelBonus": 0.0006,
                         "startTime": "0001-01-01T00:00:00Z",
                         "duration": 120000000000
                     }
@@ -461,8 +461,8 @@
                         "typeHrid": "/buff_types/physical_amplify",
                         "ratioBoost": 0,
                         "ratioBoostLevelBonus": 0,
-                        "flatBoost": 0.04,
-                        "flatBoostLevelBonus": 0.0004,
+                        "flatBoost": 0.06,
+                        "flatBoostLevelBonus": 0.0012,
                         "startTime": "0001-01-01T00:00:00Z",
                         "duration": 120000000000
                     },
@@ -472,7 +472,7 @@
                         "ratioBoost": 0,
                         "ratioBoostLevelBonus": 0,
                         "flatBoost": 4,
-                        "flatBoostLevelBonus": 0.04,
+                        "flatBoostLevelBonus": 0.08,
                         "startTime": "0001-01-01T00:00:00Z",
                         "duration": 120000000000
                     }
@@ -656,8 +656,8 @@
                         "typeHrid": "/buff_types/fire_amplify",
                         "ratioBoost": 0,
                         "ratioBoostLevelBonus": 0,
-                        "flatBoost": 0.06,
-                        "flatBoostLevelBonus": 0.0006,
+                        "flatBoost": 0.08,
+                        "flatBoostLevelBonus": 0.0016,
                         "startTime": "0001-01-01T00:00:00Z",
                         "duration": 120000000000
                     },
@@ -667,7 +667,7 @@
                         "ratioBoost": 0,
                         "ratioBoostLevelBonus": 0,
                         "flatBoost": 4,
-                        "flatBoostLevelBonus": 0.04,
+                        "flatBoostLevelBonus": 0.08,
                         "startTime": "0001-01-01T00:00:00Z",
                         "duration": 120000000000
                     }
@@ -1508,7 +1508,7 @@
         "description": "Casts heal on the ally with the lowest HP percentage",
         "isSpecialAbility": false,
         "manaCost": 60,
-        "cooldownDuration": 15000000000,
+        "cooldownDuration": 12000000000,
         "castDuration": 200000000,
         "abilityEffects": [
             {
@@ -1518,8 +1518,8 @@
                 "damageType": "",
                 "baseDamageFlat": 40,
                 "baseDamageFlatLevelBonus": 0.4,
-                "baseDamageRatio": 0.2,
-                "baseDamageRatioLevelBonus": 0.002,
+                "baseDamageRatio": 0.25,
+                "baseDamageRatioLevelBonus": 0.0025,
                 "bonusAccuracyRatio": 0,
                 "bonusAccuracyRatioLevelBonus": 0,
                 "damageOverTimeRatio": 0,
@@ -1878,7 +1878,7 @@
                         "uniqueHrid": "/buff_uniques/speed_aura_attack_speed",
                         "typeHrid": "/buff_types/attack_speed",
                         "ratioBoost": 0.03,
-                        "ratioBoostLevelBonus": 0.0003,
+                        "ratioBoostLevelBonus": 0.0006,
                         "flatBoost": 0,
                         "flatBoostLevelBonus": 0,
                         "startTime": "0001-01-01T00:00:00Z",
@@ -1890,7 +1890,7 @@
                         "ratioBoost": 0,
                         "ratioBoostLevelBonus": 0,
                         "flatBoost": 0.03,
-                        "flatBoostLevelBonus": 0.0003,
+                        "flatBoostLevelBonus": 0.0006,
                         "startTime": "0001-01-01T00:00:00Z",
                         "duration": 120000000000
                     }
@@ -2127,8 +2127,8 @@
                         "typeHrid": "/buff_types/nature_amplify",
                         "ratioBoost": 0,
                         "ratioBoostLevelBonus": 0,
-                        "flatBoost": 0.04,
-                        "flatBoostLevelBonus": 0.0004,
+                        "flatBoost": 0.06,
+                        "flatBoostLevelBonus": 0.0012,
                         "startTime": "0001-01-01T00:00:00Z",
                         "duration": 120000000000
                     },
@@ -2138,7 +2138,7 @@
                         "ratioBoost": 0,
                         "ratioBoostLevelBonus": 0,
                         "flatBoost": 0.06,
-                        "flatBoostLevelBonus": 0.0006,
+                        "flatBoostLevelBonus": 0.0012,
                         "startTime": "0001-01-01T00:00:00Z",
                         "duration": 120000000000
                     },
@@ -2148,7 +2148,7 @@
                         "ratioBoost": 0,
                         "ratioBoostLevelBonus": 0,
                         "flatBoost": 4,
-                        "flatBoostLevelBonus": 0.04,
+                        "flatBoostLevelBonus": 0.08,
                         "startTime": "0001-01-01T00:00:00Z",
                         "duration": 120000000000
                     }
@@ -2317,8 +2317,8 @@
                 "damageType": "/damage_types/nature",
                 "baseDamageFlat": 20,
                 "baseDamageFlatLevelBonus": 0.2,
-                "baseDamageRatio": 0.7,
-                "baseDamageRatioLevelBonus": 0.007,
+                "baseDamageRatio": 0.8,
+                "baseDamageRatioLevelBonus": 0.008,
                 "bonusAccuracyRatio": 0,
                 "bonusAccuracyRatioLevelBonus": 0,
                 "damageOverTimeRatio": 0,
@@ -2336,8 +2336,8 @@
                         "typeHrid": "/buff_types/armor",
                         "ratioBoost": 0,
                         "ratioBoostLevelBonus": 0,
-                        "flatBoost": -15,
-                        "flatBoostLevelBonus": -0.15,
+                        "flatBoost": -12,
+                        "flatBoostLevelBonus": -0.12,
                         "startTime": "0001-01-01T00:00:00Z",
                         "duration": 12000000000
                     },
@@ -2346,8 +2346,8 @@
                         "typeHrid": "/buff_types/water_resistance",
                         "ratioBoost": 0,
                         "ratioBoostLevelBonus": 0,
-                        "flatBoost": -20,
-                        "flatBoostLevelBonus": -0.2,
+                        "flatBoost": -15,
+                        "flatBoostLevelBonus": -0.15,
                         "startTime": "0001-01-01T00:00:00Z",
                         "duration": 12000000000
                     },
@@ -2356,8 +2356,8 @@
                         "typeHrid": "/buff_types/nature_resistance",
                         "ratioBoost": 0,
                         "ratioBoostLevelBonus": 0,
-                        "flatBoost": -25,
-                        "flatBoostLevelBonus": -0.25,
+                        "flatBoost": -20,
+                        "flatBoostLevelBonus": -0.2,
                         "startTime": "0001-01-01T00:00:00Z",
                         "duration": 12000000000
                     },
@@ -2366,8 +2366,8 @@
                         "typeHrid": "/buff_types/fire_resistance",
                         "ratioBoost": 0,
                         "ratioBoostLevelBonus": 0,
-                        "flatBoost": -20,
-                        "flatBoostLevelBonus": -0.2,
+                        "flatBoost": -15,
+                        "flatBoostLevelBonus": -0.15,
                         "startTime": "0001-01-01T00:00:00Z",
                         "duration": 12000000000
                     }

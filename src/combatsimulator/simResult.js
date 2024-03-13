@@ -14,6 +14,7 @@ class SimResult {
         this.timeSpentAlive = [];
         this.bossSpawns = [];
         this.isElite = false;
+        this.hitpointsSpent = {};
     }
 
     addDeath(unit) {
@@ -124,6 +125,17 @@ class SimResult {
         for (let [key, value] of unit.abilityManaCosts.entries()) {
             this.manaUsed[key] = value;
         }
+    }
+
+    addHitpointsSpent(unit, source, amount) {
+        if (!this.hitpointsSpent[unit.hrid]) {
+            this.hitpointsSpent[unit.hrid] = {};
+        }
+        if (!this.hitpointsSpent[unit.hrid][source]) {
+            this.hitpointsSpent[unit.hrid][source] = 0;
+        }
+
+        this.hitpointsSpent[unit.hrid][source] += amount;
     }
 }
 

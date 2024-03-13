@@ -9,6 +9,7 @@ class Zone {
         this.monsterSpawnInfo = gameZone.monsterSpawnInfo;
         this.encountersKilled = 0;
         this.monsterSpawnInfo.battlesPerBoss = 10;
+        this.buffs = gameZone.buffs;
     }
 
     getRandomEncounter() {

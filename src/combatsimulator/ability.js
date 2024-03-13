@@ -36,6 +36,7 @@ class Ability {
                 silenceDuration: effect.silenceDuration,
                 stunChance: effect.stunChance,
                 stunDuration: effect.stunDuration,
+                spendHpRatio: effect.spendHpRatio,
                 buffs: null,
             };
             if (effect.buffs) {

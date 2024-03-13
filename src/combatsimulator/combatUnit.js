@@ -112,7 +112,8 @@ class CombatUnit {
         },
     };
     combatBuffs = {};
-    houseBuffs = {};
+    permanentBuffs = {};
+    zoneBuffs = {};
 
     constructor() { }
 
@@ -281,22 +282,25 @@ class CombatUnit {
         this.updateCombatDetails();
     }
 
-    addHouseBuff(buff) {
-        if (this.houseBuffs[buff.typeHrid]) {
-            this.houseBuffs[buff.typeHrid].flatBoost += buff.flatBoost;
-            this.houseBuffs[buff.typeHrid].ratioBoost += buff.ratioBoost;
+    addPermanentBuff(buff) {
+        if (this.permanentBuffs[buff.typeHrid]) {
+            this.permanentBuffs[buff.typeHrid].flatBoost += buff.flatBoost;
+            this.permanentBuffs[buff.typeHrid].ratioBoost += buff.ratioBoost;
         } else {
-            this.houseBuffs[buff.typeHrid] = buff;
+            this.permanentBuffs[buff.typeHrid] = buff;
         }
     }
 
-    generateHouseBuffs() {
+    generatePermanentBuffs() {
         for (let i = 0; i < this.houseRooms.length; i++) {
             const houseRoom = this.houseRooms[i];
             houseRoom.buffs.forEach(buff => {
-                this.addHouseBuff(buff);
+                this.addPermanentBuff(buff);
             });
         }
+        this.zoneBuffs.forEach(buff => {
+            this.addPermanentBuff(buff);
+        });
     }
 
     removeExpiredBuffs(currentTime) {
@@ -311,7 +315,7 @@ class CombatUnit {
     }
 
     clearBuffs() {
-        this.combatBuffs = structuredClone(this.houseBuffs);
+        this.combatBuffs = structuredClone(this.permanentBuffs);
         this.updateCombatDetails();
     }
 
