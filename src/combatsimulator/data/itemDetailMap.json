@@ -622,9 +622,9 @@
         },
         "sortIndex": 585
     },
-    "/items/advanced_task_ring": {
-        "hrid": "/items/advanced_task_ring",
-        "name": "Advanced Task Ring",
+    "/items/advanced_task_badge": {
+        "hrid": "/items/advanced_task_badge",
+        "name": "Advanced Task Badge",
         "description": "",
         "categoryHrid": "/item_categories/equipment",
         "sellPrice": 1000,
@@ -643,7 +643,7 @@
         ],
         "protectionItemHrids": [],
         "equipmentDetail": {
-            "type": "/equipment_types/ring",
+            "type": "/equipment_types/trinket",
             "levelRequirements": [],
             "combatStats": {
                 "combatStyleHrids": null,
@@ -830,7 +830,7 @@
             "levelRequirements": null,
             "experienceGain": 0
         },
-        "sortIndex": 398
+        "sortIndex": 408
     },
     "/items/amber": {
         "hrid": "/items/amber",
@@ -5511,12 +5511,12 @@
                 "criticalDamage": 0,
                 "stabAccuracy": 0,
                 "slashAccuracy": 0,
-                "smashAccuracy": 0.12,
+                "smashAccuracy": 0.24,
                 "rangedAccuracy": 0,
                 "magicAccuracy": -0.12,
                 "stabDamage": 0,
                 "slashDamage": 0,
-                "smashDamage": 0.12,
+                "smashDamage": 0.28,
                 "rangedDamage": 0,
                 "magicDamage": 0,
                 "taskDamage": 0,
@@ -5545,7 +5545,7 @@
                 "lifeSteal": 0,
                 "manaLeech": 0,
                 "tenacity": 0,
-                "threat": 0,
+                "threat": 20,
                 "HPRegen": 0,
                 "MPRegen": 0,
                 "combatDropRate": 0,
@@ -5596,12 +5596,12 @@
                 "criticalDamage": 0,
                 "stabAccuracy": 0,
                 "slashAccuracy": 0,
-                "smashAccuracy": 0.0024,
+                "smashAccuracy": 0.0048,
                 "rangedAccuracy": 0,
                 "magicAccuracy": 0,
                 "stabDamage": 0,
                 "slashDamage": 0,
-                "smashDamage": 0.0024,
+                "smashDamage": 0.005600000000000001,
                 "rangedDamage": 0,
                 "magicDamage": 0,
                 "taskDamage": 0,
@@ -5630,7 +5630,7 @@
                 "lifeSteal": 0,
                 "manaLeech": 0,
                 "tenacity": 0,
-                "threat": 0,
+                "threat": 0.4,
                 "HPRegen": 0,
                 "MPRegen": 0,
                 "combatDropRate": 0,
@@ -11025,9 +11025,9 @@
         },
         "sortIndex": 306
     },
-    "/items/basic_task_ring": {
-        "hrid": "/items/basic_task_ring",
-        "name": "Basic Task Ring",
+    "/items/basic_task_badge": {
+        "hrid": "/items/basic_task_badge",
+        "name": "Basic Task Badge",
         "description": "",
         "categoryHrid": "/item_categories/equipment",
         "sellPrice": 1000,
@@ -11046,7 +11046,7 @@
         ],
         "protectionItemHrids": [],
         "equipmentDetail": {
-            "type": "/equipment_types/ring",
+            "type": "/equipment_types/trinket",
             "levelRequirements": [],
             "combatStats": {
                 "combatStyleHrids": null,
@@ -11233,7 +11233,7 @@
             "levelRequirements": null,
             "experienceGain": 0
         },
-        "sortIndex": 397
+        "sortIndex": 407
     },
     "/items/bear_essence": {
         "hrid": "/items/bear_essence",
@@ -18633,12 +18633,12 @@
                 "criticalDamage": 0,
                 "stabAccuracy": 0,
                 "slashAccuracy": 0,
-                "smashAccuracy": 0.18,
+                "smashAccuracy": 0.36,
                 "rangedAccuracy": 0,
                 "magicAccuracy": -0.18,
                 "stabDamage": 0,
                 "slashDamage": 0,
-                "smashDamage": 0.18,
+                "smashDamage": 0.42,
                 "rangedDamage": 0,
                 "magicDamage": 0,
                 "taskDamage": 0,
@@ -18667,7 +18667,7 @@
                 "lifeSteal": 0,
                 "manaLeech": 0,
                 "tenacity": 0,
-                "threat": 0,
+                "threat": 30,
                 "HPRegen": 0,
                 "MPRegen": 0,
                 "combatDropRate": 0,
@@ -18718,12 +18718,12 @@
                 "criticalDamage": 0,
                 "stabAccuracy": 0,
                 "slashAccuracy": 0,
-                "smashAccuracy": 0.0036,
+                "smashAccuracy": 0.0072,
                 "rangedAccuracy": 0,
                 "magicAccuracy": 0,
                 "stabDamage": 0,
                 "slashDamage": 0,
-                "smashDamage": 0.0036,
+                "smashDamage": 0.0084,
                 "rangedDamage": 0,
                 "magicDamage": 0,
                 "taskDamage": 0,
@@ -18752,7 +18752,7 @@
                 "lifeSteal": 0,
                 "manaLeech": 0,
                 "tenacity": 0,
-                "threat": 0,
+                "threat": 0.6,
                 "HPRegen": 0,
                 "MPRegen": 0,
                 "combatDropRate": 0,
@@ -26540,12 +26540,12 @@
                 "criticalDamage": 0,
                 "stabAccuracy": 0,
                 "slashAccuracy": 0,
-                "smashAccuracy": 0.06,
+                "smashAccuracy": 0.12,
                 "rangedAccuracy": 0,
                 "magicAccuracy": -0.06,
                 "stabDamage": 0,
                 "slashDamage": 0,
-                "smashDamage": 0.06,
+                "smashDamage": 0.14,
                 "rangedDamage": 0,
                 "magicDamage": 0,
                 "taskDamage": 0,
@@ -26574,7 +26574,7 @@
                 "lifeSteal": 0,
                 "manaLeech": 0,
                 "tenacity": 0,
-                "threat": 0,
+                "threat": 10,
                 "HPRegen": 0,
                 "MPRegen": 0,
                 "combatDropRate": 0,
@@ -26625,12 +26625,12 @@
                 "criticalDamage": 0,
                 "stabAccuracy": 0,
                 "slashAccuracy": 0,
-                "smashAccuracy": 0.0012,
+                "smashAccuracy": 0.0024,
                 "rangedAccuracy": 0,
                 "magicAccuracy": 0,
                 "stabDamage": 0,
                 "slashDamage": 0,
-                "smashDamage": 0.0012,
+                "smashDamage": 0.0028000000000000004,
                 "rangedDamage": 0,
                 "magicDamage": 0,
                 "taskDamage": 0,
@@ -26659,7 +26659,7 @@
                 "lifeSteal": 0,
                 "manaLeech": 0,
                 "tenacity": 0,
-                "threat": 0,
+                "threat": 0.2,
                 "HPRegen": 0,
                 "MPRegen": 0,
                 "combatDropRate": 0,
@@ -30826,7 +30826,10 @@
                 "count": 1345
             }
         ],
-        "protectionItemHrids": [],
+        "protectionItemHrids": [
+            "/items/sinister_cape",
+            "/items/enchanted_cloak"
+        ],
         "equipmentDetail": {
             "type": "/equipment_types/back",
             "levelRequirements": [
@@ -36135,12 +36138,12 @@
                 "criticalDamage": 0,
                 "stabAccuracy": 0,
                 "slashAccuracy": 0,
-                "smashAccuracy": 0.24,
+                "smashAccuracy": 0.48,
                 "rangedAccuracy": 0,
                 "magicAccuracy": -0.24,
                 "stabDamage": 0,
                 "slashDamage": 0,
-                "smashDamage": 0.24,
+                "smashDamage": 0.56,
                 "rangedDamage": 0,
                 "magicDamage": 0,
                 "taskDamage": 0,
@@ -36169,7 +36172,7 @@
                 "lifeSteal": 0,
                 "manaLeech": 0,
                 "tenacity": 0,
-                "threat": 0,
+                "threat": 40,
                 "HPRegen": 0,
                 "MPRegen": 0,
                 "combatDropRate": 0,
@@ -36220,12 +36223,12 @@
                 "criticalDamage": 0,
                 "stabAccuracy": 0,
                 "slashAccuracy": 0,
-                "smashAccuracy": 0.0048,
+                "smashAccuracy": 0.0096,
                 "rangedAccuracy": 0,
                 "magicAccuracy": 0,
                 "stabDamage": 0,
                 "slashDamage": 0,
-                "smashDamage": 0.0048,
+                "smashDamage": 0.011200000000000002,
                 "rangedDamage": 0,
                 "magicDamage": 0,
                 "taskDamage": 0,
@@ -36254,7 +36257,7 @@
                 "lifeSteal": 0,
                 "manaLeech": 0,
                 "tenacity": 0,
-                "threat": 0,
+                "threat": 0.8,
                 "HPRegen": 0,
                 "MPRegen": 0,
                 "combatDropRate": 0,
@@ -44998,7 +45001,7 @@
             "levelRequirements": null,
             "experienceGain": 0
         },
-        "sortIndex": 393
+        "sortIndex": 397
     },
     "/items/earrings_of_gathering": {
         "hrid": "/items/earrings_of_gathering",
@@ -45212,7 +45215,7 @@
             "levelRequirements": null,
             "experienceGain": 0
         },
-        "sortIndex": 391
+        "sortIndex": 395
     },
     "/items/earrings_of_rare_find": {
         "hrid": "/items/earrings_of_rare_find",
@@ -45426,7 +45429,7 @@
             "levelRequirements": null,
             "experienceGain": 0
         },
-        "sortIndex": 396
+        "sortIndex": 400
     },
     "/items/earrings_of_regeneration": {
         "hrid": "/items/earrings_of_regeneration",
@@ -45644,7 +45647,7 @@
             "levelRequirements": null,
             "experienceGain": 0
         },
-        "sortIndex": 394
+        "sortIndex": 398
     },
     "/items/earrings_of_resistance": {
         "hrid": "/items/earrings_of_resistance",
@@ -45862,7 +45865,7 @@
             "levelRequirements": null,
             "experienceGain": 0
         },
-        "sortIndex": 395
+        "sortIndex": 399
     },
     "/items/earrings_of_threat": {
         "hrid": "/items/earrings_of_threat",
@@ -46076,7 +46079,7 @@
             "levelRequirements": null,
             "experienceGain": 0
         },
-        "sortIndex": 392
+        "sortIndex": 396
     },
     "/items/efficiency_tea": {
         "hrid": "/items/efficiency_tea",
@@ -47349,7 +47352,10 @@
                 "count": 1345
             }
         ],
-        "protectionItemHrids": [],
+        "protectionItemHrids": [
+            "/items/chimerical_quiver",
+            "/items/sinister_cape"
+        ],
         "equipmentDetail": {
             "type": "/equipment_types/back",
             "levelRequirements": [
@@ -49002,9 +49008,9 @@
         },
         "sortIndex": 539
     },
-    "/items/expert_task_ring": {
-        "hrid": "/items/expert_task_ring",
-        "name": "Expert Task Ring",
+    "/items/expert_task_badge": {
+        "hrid": "/items/expert_task_badge",
+        "name": "Expert Task Badge",
         "description": "",
         "categoryHrid": "/item_categories/equipment",
         "sellPrice": 1000,
@@ -49023,7 +49029,7 @@
         ],
         "protectionItemHrids": [],
         "equipmentDetail": {
-            "type": "/equipment_types/ring",
+            "type": "/equipment_types/trinket",
             "levelRequirements": [],
             "combatStats": {
                 "combatStyleHrids": null,
@@ -49210,7 +49216,7 @@
             "levelRequirements": null,
             "experienceGain": 0
         },
-        "sortIndex": 399
+        "sortIndex": 409
     },
     "/items/eye_of_the_watcher": {
         "hrid": "/items/eye_of_the_watcher",
@@ -50474,7 +50480,7 @@
             "levelRequirements": null,
             "experienceGain": 0
         },
-        "sortIndex": 387
+        "sortIndex": 391
     },
     "/items/fireball": {
         "hrid": "/items/fireball",
@@ -54482,7 +54488,7 @@
             "levelRequirements": null,
             "experienceGain": 0
         },
-        "sortIndex": 409
+        "sortIndex": 389
     },
     "/items/ginkgo_bow": {
         "hrid": "/items/ginkgo_bow",
@@ -62811,12 +62817,12 @@
                 "criticalDamage": 0,
                 "stabAccuracy": 0,
                 "slashAccuracy": 0,
-                "smashAccuracy": 0.36,
+                "smashAccuracy": 0.72,
                 "rangedAccuracy": 0,
                 "magicAccuracy": -0.36,
                 "stabDamage": 0,
                 "slashDamage": 0,
-                "smashDamage": 0.36,
+                "smashDamage": 0.84,
                 "rangedDamage": 0,
                 "magicDamage": 0,
                 "taskDamage": 0,
@@ -62845,7 +62851,7 @@
                 "lifeSteal": 0,
                 "manaLeech": 0,
                 "tenacity": 0,
-                "threat": 0,
+                "threat": 60,
                 "HPRegen": 0,
                 "MPRegen": 0,
                 "combatDropRate": 0,
@@ -62896,12 +62902,12 @@
                 "criticalDamage": 0,
                 "stabAccuracy": 0,
                 "slashAccuracy": 0,
-                "smashAccuracy": 0.0072,
+                "smashAccuracy": 0.0144,
                 "rangedAccuracy": 0,
                 "magicAccuracy": 0,
                 "stabDamage": 0,
                 "slashDamage": 0,
-                "smashDamage": 0.0072,
+                "smashDamage": 0.0168,
                 "rangedDamage": 0,
                 "magicDamage": 0,
                 "taskDamage": 0,
@@ -62930,7 +62936,7 @@
                 "lifeSteal": 0,
                 "manaLeech": 0,
                 "tenacity": 0,
-                "threat": 0,
+                "threat": 1.2,
                 "HPRegen": 0,
                 "MPRegen": 0,
                 "combatDropRate": 0,
@@ -70642,7 +70648,7 @@
             "levelRequirements": null,
             "experienceGain": 0
         },
-        "sortIndex": 408
+        "sortIndex": 388
     },
     "/items/large_treasure_chest": {
         "hrid": "/items/large_treasure_chest",
@@ -77772,7 +77778,7 @@
             "levelRequirements": null,
             "experienceGain": 0
         },
-        "sortIndex": 407
+        "sortIndex": 387
     },
     "/items/medium_treasure_chest": {
         "hrid": "/items/medium_treasure_chest",
@@ -80242,7 +80248,7 @@
             "levelRequirements": null,
             "experienceGain": 0
         },
-        "sortIndex": 386
+        "sortIndex": 390
     },
     "/items/necklace_of_wisdom": {
         "hrid": "/items/necklace_of_wisdom",
@@ -80460,7 +80466,7 @@
             "levelRequirements": null,
             "experienceGain": 0
         },
-        "sortIndex": 390
+        "sortIndex": 394
     },
     "/items/orange": {
         "hrid": "/items/orange",
@@ -90561,12 +90567,12 @@
                 "criticalDamage": 0,
                 "stabAccuracy": 0,
                 "slashAccuracy": 0,
-                "smashAccuracy": 0.3,
+                "smashAccuracy": 0.6,
                 "rangedAccuracy": 0,
                 "magicAccuracy": -0.3,
                 "stabDamage": 0,
                 "slashDamage": 0,
-                "smashDamage": 0.3,
+                "smashDamage": 0.7,
                 "rangedDamage": 0,
                 "magicDamage": 0,
                 "taskDamage": 0,
@@ -90595,7 +90601,7 @@
                 "lifeSteal": 0,
                 "manaLeech": 0,
                 "tenacity": 0,
-                "threat": 0,
+                "threat": 50,
                 "HPRegen": 0,
                 "MPRegen": 0,
                 "combatDropRate": 0,
@@ -90646,12 +90652,12 @@
                 "criticalDamage": 0,
                 "stabAccuracy": 0,
                 "slashAccuracy": 0,
-                "smashAccuracy": 0.006,
+                "smashAccuracy": 0.012,
                 "rangedAccuracy": 0,
                 "magicAccuracy": 0,
                 "stabDamage": 0,
                 "slashDamage": 0,
-                "smashDamage": 0.006,
+                "smashDamage": 0.013999999999999999,
                 "rangedDamage": 0,
                 "magicDamage": 0,
                 "taskDamage": 0,
@@ -90680,7 +90686,7 @@
                 "lifeSteal": 0,
                 "manaLeech": 0,
                 "tenacity": 0,
-                "threat": 0,
+                "threat": 1,
                 "HPRegen": 0,
                 "MPRegen": 0,
                 "combatDropRate": 0,
@@ -94830,7 +94836,7 @@
             "levelRequirements": null,
             "experienceGain": 0
         },
-        "sortIndex": 388
+        "sortIndex": 392
     },
     "/items/red_chefs_hat": {
         "hrid": "/items/red_chefs_hat",
@@ -100357,7 +100363,7 @@
             "levelRequirements": null,
             "experienceGain": 0
         },
-        "sortIndex": 402
+        "sortIndex": 403
     },
     "/items/ring_of_gathering": {
         "hrid": "/items/ring_of_gathering",
@@ -100571,7 +100577,7 @@
             "levelRequirements": null,
             "experienceGain": 0
         },
-        "sortIndex": 400
+        "sortIndex": 401
     },
     "/items/ring_of_rare_find": {
         "hrid": "/items/ring_of_rare_find",
@@ -100785,7 +100791,7 @@
             "levelRequirements": null,
             "experienceGain": 0
         },
-        "sortIndex": 405
+        "sortIndex": 406
     },
     "/items/ring_of_regeneration": {
         "hrid": "/items/ring_of_regeneration",
@@ -101003,7 +101009,7 @@
             "levelRequirements": null,
             "experienceGain": 0
         },
-        "sortIndex": 403
+        "sortIndex": 404
     },
     "/items/ring_of_resistance": {
         "hrid": "/items/ring_of_resistance",
@@ -101221,7 +101227,7 @@
             "levelRequirements": null,
             "experienceGain": 0
         },
-        "sortIndex": 404
+        "sortIndex": 405
     },
     "/items/ring_of_threat": {
         "hrid": "/items/ring_of_threat",
@@ -101435,7 +101441,7 @@
             "levelRequirements": null,
             "experienceGain": 0
         },
-        "sortIndex": 401
+        "sortIndex": 402
     },
     "/items/robusta_coffee_bean": {
         "hrid": "/items/robusta_coffee_bean",
@@ -107221,7 +107227,10 @@
                 "count": 1345
             }
         ],
-        "protectionItemHrids": [],
+        "protectionItemHrids": [
+            "/items/chimerical_quiver",
+            "/items/enchanted_cloak"
+        ],
         "equipmentDetail": {
             "type": "/equipment_types/back",
             "levelRequirements": [
@@ -109050,7 +109059,7 @@
             "levelRequirements": null,
             "experienceGain": 0
         },
-        "sortIndex": 406
+        "sortIndex": 386
     },
     "/items/small_treasure_chest": {
         "hrid": "/items/small_treasure_chest",
@@ -112637,12 +112646,12 @@
                 "criticalDamage": 0,
                 "stabAccuracy": 0,
                 "slashAccuracy": 0,
-                "smashAccuracy": 0.36,
+                "smashAccuracy": 0.8,
                 "rangedAccuracy": 0,
                 "magicAccuracy": -0.36,
                 "stabDamage": 0,
                 "slashDamage": 0,
-                "smashDamage": 0.36,
+                "smashDamage": 0.9,
                 "rangedDamage": 0,
                 "magicDamage": 0,
                 "taskDamage": 0,
@@ -112671,7 +112680,7 @@
                 "lifeSteal": 0,
                 "manaLeech": 0,
                 "tenacity": 0,
-                "threat": 0,
+                "threat": 65,
                 "HPRegen": 0,
                 "MPRegen": 0,
                 "combatDropRate": 0,
@@ -112722,12 +112731,12 @@
                 "criticalDamage": 0,
                 "stabAccuracy": 0,
                 "slashAccuracy": 0,
-                "smashAccuracy": 0.0072,
+                "smashAccuracy": 0.016,
                 "rangedAccuracy": 0,
                 "magicAccuracy": 0,
                 "stabDamage": 0,
                 "slashDamage": 0,
-                "smashDamage": 0.0072,
+                "smashDamage": 0.018000000000000002,
                 "rangedDamage": 0,
                 "magicDamage": 0,
                 "taskDamage": 0,
@@ -112756,7 +112765,7 @@
                 "lifeSteal": 0,
                 "manaLeech": 0,
                 "tenacity": 0,
-                "threat": 0,
+                "threat": 1.3,
                 "HPRegen": 0,
                 "MPRegen": 0,
                 "combatDropRate": 0,
@@ -126455,12 +126464,12 @@
                 "criticalDamage": 0,
                 "stabAccuracy": 0,
                 "slashAccuracy": 0,
-                "smashAccuracy": 0.09,
+                "smashAccuracy": 0.18,
                 "rangedAccuracy": 0,
                 "magicAccuracy": -0.09,
                 "stabDamage": 0,
                 "slashDamage": 0,
-                "smashDamage": 0.09,
+                "smashDamage": 0.21,
                 "rangedDamage": 0,
                 "magicDamage": 0,
                 "taskDamage": 0,
@@ -126489,7 +126498,7 @@
                 "lifeSteal": 0,
                 "manaLeech": 0,
                 "tenacity": 0,
-                "threat": 0,
+                "threat": 15,
                 "HPRegen": 0,
                 "MPRegen": 0,
                 "combatDropRate": 0,
@@ -126540,12 +126549,12 @@
                 "criticalDamage": 0,
                 "stabAccuracy": 0,
                 "slashAccuracy": 0,
-                "smashAccuracy": 0.0018,
+                "smashAccuracy": 0.0036,
                 "rangedAccuracy": 0,
                 "magicAccuracy": 0,
                 "stabDamage": 0,
                 "slashDamage": 0,
-                "smashDamage": 0.0018,
+                "smashDamage": 0.0042,
                 "rangedDamage": 0,
                 "magicDamage": 0,
                 "taskDamage": 0,
@@ -126574,7 +126583,7 @@
                 "lifeSteal": 0,
                 "manaLeech": 0,
                 "tenacity": 0,
-                "threat": 0,
+                "threat": 0.3,
                 "HPRegen": 0,
                 "MPRegen": 0,
                 "combatDropRate": 0,
@@ -132657,7 +132666,7 @@
             "levelRequirements": null,
             "experienceGain": 0
         },
-        "sortIndex": 389
+        "sortIndex": 393
     },
     "/items/woodcutting_tea": {
         "hrid": "/items/woodcutting_tea",
